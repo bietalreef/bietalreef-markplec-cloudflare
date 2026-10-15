@@ -1,0 +1,41 @@
+{
+  "verifiedAt": "2026-10-15",
+  "marketplace": {
+    "displayName": "سوق بيت الريف المفتوح",
+    "packageName": "bietalreef-marketplace",
+    "repository": "bietalreef/bietalreef-markplec-cloudflare",
+    "visibility": "public",
+    "branch": "main",
+    "developmentProject": "bietalreef-market-staging",
+    "developmentHost": "bietalreef-market-staging.pages.dev",
+    "productionTarget": "app.bietalreef.ae",
+    "productionConnected": false,
+    "deploymentMethod": "direct-upload",
+    "automaticGitDeployment": false
+  },
+  "platform": {
+    "repository": "bietalreef/bietalreef-platform-cloudflare",
+    "visibility": "public",
+    "branch": "master",
+    "productionTarget": "bietalreef.ae"
+  },
+  "admin": {
+    "repository": "bietalreef/bietalreef-admin-cloudflare",
+    "visibility": "private",
+    "branch": "main",
+    "project": "bietalreef-admin-staging",
+    "host": "admin.bietalreef.ae"
+  },
+  "providerApp": {
+    "repository": "bietalreef/bietalreef-weyaak-flutter",
+    "visibility": "private",
+    "branch": "main",
+    "host": "providers.bietalreef.ae"
+  },
+  "legacyMarketplace": {
+    "repository": "bietalreef/Figmawebapp",
+    "cloudflareProject": "appbietalreef",
+    "role": "existing production retained until migration validation"
+  },
+  "namingNote": "markplec is the exact repository name requested by the owner. Marketplace is the normalized package/UI term. No repository was renamed and no legacy production source was re-pointed."
+}
