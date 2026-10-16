@@ -9,7 +9,7 @@ await writeFile('dist/_headers',`/*
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none'
 `);
 await writeFile('dist/_redirects','/* /index.html 200\n');
 await writeFile('dist/version.json',JSON.stringify({project:'bietalreef-marketplace',environment:'development',dataConnected:false,repository:'bietalreef/bietalreef-markplec-cloudflare',commit:process.env.COMMIT_SHA||'local',builtAt:new Date().toISOString()},null,2));
