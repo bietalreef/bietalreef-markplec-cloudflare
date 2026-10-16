@@ -18,7 +18,7 @@ export const sceneItems = [
     id: 'finishing', label: 'الجدران والتشطيبات', kind: 'service', kindLabel: 'خدمة',
     title: 'تجديد يبدأ من التفاصيل', detail: 'ابحث عن خدمات التصميم والدهان والتشطيبات.',
     action: 'استكشف الخدمات', href: '#results?type=service&category=construction',
-    coords: {wide: [65, 26], mobile: [76, 28]},
+    coords: {wide: [86, 38], mobile: [82, 53]},
   },
   {
     id: 'rug', label: 'السجاد والديكور', kind: 'offer', kindLabel: 'عروض',
