@@ -4,7 +4,7 @@ import {join} from 'node:path';
 // Build the same Worker module used for the published TEST hostname.
 // Static assets are embedded and never read from the live marketplace.
 const dir='dist', output='dist-worker';
-const files=['index.html','app.js','styles.css','footer-pages.js','footer-ux.css','mobile-ux.css','scene-ux.css','interactive-scene.js','routes.js'];
+const files=['index.html','app.js','styles.css','footer-pages.js','footer-ux.css','mobile-ux.css','scene-ux.css','showcase.css','interactive-scene.js','scene-images.js','routes.js'];
 const assets=Object.fromEntries(await Promise.all(files.map(async x=>[x,await readFile(join(dir,x),'utf8')])));
 assets['robots.txt']='User-agent: *\nDisallow: /\n';
 const worker=`const ASSETS=${JSON.stringify(assets)};
