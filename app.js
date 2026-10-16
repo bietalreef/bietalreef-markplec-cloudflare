@@ -169,6 +169,28 @@ document.addEventListener('click',e=>{
  if(target.hasAttribute('data-preview-action')){const toast=document.querySelector('#toast');toast.textContent='هذه الخدمة غير متاحة الآن. يمكنك متابعة استكشاف السوق.';toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,4000);}
 });
 document.getElementById('scene-dialog-link')?.addEventListener('click',()=>document.getElementById('scene-dialog')?.close());
+// A green badge appears only when this public origin answers successfully.
+// This status does not imply a logged-in user, connected WhatsApp or provider API.
+async function verifyPublicConnection(){
+ const badge=document.getElementById('market-connection-status');
+ if(!badge)return;
+ let alive=false;
+ if(navigator.onLine!==false){
+   try{
+     const response=await fetch('/robots.txt',{method:'HEAD',cache:'no-store',signal:AbortSignal.timeout(6000),credentials:'omit'});
+     alive=response.ok;
+   }catch{alive=false;}
+ }
+ badge.classList.toggle('online',alive);
+ badge.classList.toggle('offline',!alive);
+ badge.classList.remove('checking');
+ badge.querySelector('b').textContent=alive?'متصل الآن':'غير متصل';
+}
+window.addEventListener('online',()=>void verifyPublicConnection());
+window.addEventListener('offline',()=>void verifyPublicConnection());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void verifyPublicConnection();});
+void verifyPublicConnection();
+
 window.addEventListener('hashchange',()=>render({focus:true}));
 renderFooter();
 render();
