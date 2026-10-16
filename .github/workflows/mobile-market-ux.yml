@@ -1,0 +1,23 @@
+name: Mobile marketplace UX checks
+on:
+  push:
+    branches: [feat/mobile-first-market-ux-20261016]
+  pull_request:
+    branches: [main, feat/test-market-footer-ux-20261016]
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build nonindexed test app and check syntax
+        run: npm run build:test-worker
+      - name: Run layout and regression tests
+        run: npm test
+      - name: Mark preview-only
+        run: echo 'Scope is market-test.bietalreef.ae only' >> "$GITHUB_STEP_SUMMARY"
