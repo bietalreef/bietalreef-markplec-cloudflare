@@ -3,5 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": {"build": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs"}
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build:test-worker": "npm run build && node scripts/build-market-test-worker.mjs && node --check dist-worker/worker.mjs"
+  }
 }
