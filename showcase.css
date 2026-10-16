@@ -1,0 +1,95 @@
+/* Published visual design — matches the approved photographic storefront direction. */
+/* Portrait and panorama are derived from the same original OpenAI-generated interior photograph. */
+.hero.hero-photo{
+  position:relative; display:block; isolation:isolate; background:#dcd7c9;
+  border-radius:24px; min-height:470px; overflow:hidden; box-shadow:0 10px 24px rgba(26,50,39,.08);
+}
+.hero-photo>.hero-art.scene-art{
+  position:absolute; inset:0; width:100%; height:100%; min-height:0; max-height:none;
+  overflow:hidden; aspect-ratio:auto; border-radius:0; background:#ddd9cb; z-index:0;
+}
+.hero-photograph,.hero-photograph img{display:block;position:absolute;inset:0;width:100%;height:100%}
+.hero-photograph img{object-fit:cover;object-position:center 51%;transform:scaleX(-1);filter:saturate(.96) contrast(.98)}
+.hero-photograph-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(to right,rgba(255,253,247,.88) 0%,rgba(255,253,247,.72) 24%,rgba(255,253,247,.05) 54%,transparent 80%)}
+.hero-photo>.hero-copy{
+  position:relative; z-index:3; width:min(45%,520px); min-height:470px; padding:52px 40px;
+  margin-right:auto; margin-left:0; display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+  text-align:right; direction:rtl; background:transparent; box-sizing:border-box;
+}
+.hero-photo>.hero-copy .eyebrow{align-self:stretch;letter-spacing:0;color:#31533f;font-size:12px}
+.hero-photo h1{font-size:clamp(29px,3.35vw,47px);line-height:1.52;color:#17372f;text-wrap:balance;margin:13px 0 8px}
+.hero-photo h1 em{color:#426f4b}
+.hero-photo>.hero-copy>p{font-size:clamp(13px,1.05vw,16px);line-height:1.95;max-width:34ch;color:#36493d;margin:8px 0 25px}
+.hero-photo .hero-cta{gap:12px;flex-wrap:wrap}
+.hero-photo .hero-cta .button{min-height:46px;white-space:nowrap;box-shadow:0 6px 20px rgba(13,52,37,.18)}
+.hero-photo .hero-cta .text-link{border-bottom:1px solid #719578;background:rgba(255,255,255,.79);border-radius:10px;padding:12px 15px;font-weight:700;white-space:nowrap;font-size:12px}
+.hero-photo .scene-art .art-label{
+  position:absolute;inset:auto 20px 18px auto;z-index:5;max-width:35%;
+  background:rgba(15,49,35,.86);color:white;font-size:11px;padding:9px 14px;border-radius:999px;
+  box-shadow:0 3px 12px rgba(0,0,0,.16);
+}
+.hero-photo .scene-markers{z-index:4;inset:0;pointer-events:none}
+.hero-photo .scene-spot{pointer-events:auto}
+.hero-photo .scene-spot-dot{width:36px;height:36px;background:#fff;border:2px solid #2d7c4e;box-shadow:0 2px 0 5px rgba(255,255,255,.35),0 6px 22px rgba(5,34,25,.2)}
+.hero-photo .scene-spot-caption{opacity:1;bottom:calc(100% + 7px);background:rgba(255,255,255,.93);box-shadow:0 3px 10px rgba(0,0,0,.1);color:#1a3c30;font-weight:600;border:1px solid #e0e6d8}
+.hero-photo .scene-spot:nth-child(2) .scene-spot-caption{bottom:auto;top:calc(100% + 7px)}
+/* Space-based discovery ribbon sits directly below the hero, not a long empty promotion. */
+.room-discovery{padding:20px 0 0;margin-bottom:2px}
+.room-discovery .section-head{margin-bottom:12px}
+.room-discovery-track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.room-discovery-card{min-width:0;overflow:hidden;border-radius:13px;border:1px solid #e4e8df;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.room-discovery-photo{display:block;position:relative;aspect-ratio:1.45/1;overflow:hidden;background:#eeece5}
+.room-discovery-photo img{display:block;position:absolute;width:225%;height:170%;max-width:none;object-fit:cover;object-position:var(--room-pos);top:-33%;left:-55%;filter:saturate(.9);transition:transform .3s ease}
+.room-discovery-card:hover img{transform:scale(1.08)}
+.room-discovery-card strong{display:block;padding:9px 10px;font-size:12px;text-align:center;color:#1b3e34;font-weight:700;line-height:1.6}
+.room-discovery-card:focus-visible{outline:3px solid #af9b60;outline-offset:3px}
+.hero-photo+.room-discovery{margin-top:0}
+/* The old CSS depth was applied to an SVG; real photos must never receive a forced 3D warp. */
+.hero-photo .room-art,.hero-photo .room-art:hover{transform:none!important}
+@media (min-width:721px) and (max-width:1100px){
+  .hero.hero-photo{min-height:410px;margin-top:18px}
+  .hero-photo>.hero-copy{min-height:410px;width:49%;padding:26px 26px}
+  .hero-photo h1{font-size:clamp(26px,3.1vw,36px)}
+  .hero-photo>.hero-copy>p{font-size:13px}
+  .hero-photo .hero-photograph img{object-position:52% 51%}
+  .room-discovery-track{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .room-discovery-photo{aspect-ratio:1.9/1}
+  .hero-photo .scene-art .art-label{font-size:10px}
+}
+@media(max-width:720px){
+  .hero.hero-photo{display:block;min-height:510px;margin-top:10px;border-radius:17px}
+  .hero-photo>.hero-art.scene-art{height:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important}
+  .hero-photo>.hero-copy{
+    width:100%;min-height:510px;max-width:none;position:relative;z-index:3;
+    background:linear-gradient(180deg,rgba(255,253,249,.98) 0%,rgba(255,253,249,.91) 28%,rgba(255,253,249,.55) 40%,rgba(255,253,249,0) 59%);
+    display:block;padding:20px 18px;text-align:right;
+  }
+  .hero-photo h1{font-size:clamp(24px,6.1vw,34px);line-height:1.48;max-width:24ch;margin:8px 0}
+  .hero-photo>.hero-copy>p{font-size:12px;line-height:1.78;max-width:33ch;margin:6px 0 12px}
+  .hero-photo>.hero-copy .eyebrow{font-size:10px}
+  .hero-photo .hero-cta{display:flex;gap:8px;justify-content:flex-start}
+  .hero-photo .hero-cta .button{font-size:11px;min-height:42px;padding:9px 13px}
+  .hero-photo .hero-cta .text-link{font-size:11px;padding:8px 10px}
+  .hero-photo .hero-photograph img{transform:none;object-position:center 51%}
+  .hero-photograph-shade{background:linear-gradient(180deg,rgba(255,253,248,.2) 0%,rgba(255,253,248,0) 38%,rgba(17,45,25,.05) 100%)}
+  .hero-photo .scene-art .art-label{right:12px;bottom:10px;left:auto;max-width:65%;font-size:10px;padding:7px 11px}
+  .hero-photo .scene-spot{left:var(--mobile-x);top:var(--mobile-y)}
+  .hero-photo .scene-spot-caption{opacity:0}
+  .hero-photo .scene-spot-dot{width:33px;height:33px;font-size:21px}
+  .room-discovery{padding-top:17px}
+  .room-discovery .section-head h2{font-size:17px}
+  .room-discovery-track{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:10px;margin:0 -14px;padding:3px 14px 14px;scroll-snap-type:x proximity;scrollbar-width:none}
+  .room-discovery-track::-webkit-scrollbar{display:none}
+  .room-discovery-card{flex:0 0 127px;scroll-snap-align:start}
+  .room-discovery-photo{aspect-ratio:1.2/1}
+  .room-discovery-card strong{font-size:11px;padding:7px 6px}
+  #content .section{padding-block:18px}
+  .hero-photo+.section{padding-top:14px}
+}
+@media(max-width:360px){
+  .hero.hero-photo,.hero-photo>.hero-copy{min-height:510px}
+  .hero-photo h1{font-size:25px}
+  .hero-photo>.hero-copy{padding:15px}
+  .hero-photo .hero-cta{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){.room-discovery-card img{transition:none}}
