@@ -1,7 +1,7 @@
 import {mkdir,copyFile,writeFile,rm} from 'node:fs/promises';
 await rm('dist',{recursive:true,force:true});
 await mkdir('dist',{recursive:true});
-for(const name of ['index.html','styles.css','footer-ux.css','mobile-ux.css','footer-pages.js','app.js','routes.js'])await copyFile(name,`dist/${name}`);
+for(const name of ['index.html','styles.css','footer-ux.css','mobile-ux.css','scene-ux.css','interactive-scene.js','footer-pages.js','app.js','routes.js'])await copyFile(name,`dist/${name}`);
 await writeFile('dist/robots.txt','User-agent: *\nDisallow: /\n');
 await writeFile('dist/_headers',`/*
   X-Robots-Tag: noindex, nofollow, noarchive
