@@ -21,7 +21,7 @@ test('no debugging or implementation copy appears in the shopping header',async(
  const app=await readFile(path+'app.js','utf8');
  assert.doesNotMatch(html,/بيئة تطوير|نموذج تجربة جديد|نسخة منشورة غير مفهرسة/);
  assert.doesNotMatch(app,/تصميم قبل ربط التشغيل|نموذج العمل وقنوات العرض/);
- assert.match(app,/من قطعة أثاث تحبها إلى خدمة تحتاجها/);
+ assert.match(app,/اكتشف الأثاث والديكور والخدمات التي يحتاجها بيتك/);
  assert.match(app,/من فكرتك إلى اختيارك المناسب/);
  assert.match(html,/noindex,nofollow,noarchive/);
 });
