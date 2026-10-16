@@ -93,3 +93,38 @@
   .hero-photo .hero-cta{gap:6px}
 }
 @media(prefers-reduced-motion:reduce){.room-discovery-card img{transition:none}}
+
+/* Approved category strip: six DIFFERENT category photographs, not six crops of one living room. */
+@media (min-width:721px){
+  .room-discovery{padding:12px 0 10px;margin:0}
+  .room-discovery .section-head{display:none}
+  .room-discovery-track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;padding:0;margin:0;overflow:visible}
+  .room-discovery-card{display:flex;flex-direction:column;min-width:0;border:1px solid #e4e7df;border-radius:12px;background:white;padding:4px 4px 8px;box-shadow:0 2px 9px rgba(22,41,30,.04)}
+  .room-discovery-photo{display:block;aspect-ratio:1.72/1;position:relative;overflow:hidden;border-radius:9px;background:#f2f0e8}
+  .room-discovery-photo img{display:block;inset:0;top:0;left:0;width:100%;height:100%;max-width:100%;object-fit:cover;object-position:center;filter:none;transition:transform .2s ease}
+  .room-discovery-card strong{display:block;padding:7px 5px 0;margin:0;text-align:center;font-size:12px;line-height:1.5;white-space:normal}
+  .room-discovery-card small{display:block;font-size:10px;line-height:1.6;color:#728077;text-align:center;padding:2px 5px 0}
+  .home-categories{display:none}
+}
+@media (min-width:721px) and (max-width:850px){
+  .room-discovery-track{gap:7px}
+  .room-discovery-card strong{font-size:11px}
+  .room-discovery-card small{font-size:9px}
+}
+@media (max-width:720px){
+  /* Match the supplied phone reference: the hero is followed by a 3×2 icon grid, no redundant photo slider. */
+  .room-discovery{display:none!important}
+  .home-categories{display:block;padding:17px 0 14px!important}
+  .home-categories .section-head{margin-bottom:12px}
+  .home-categories .category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+  .home-categories .category{min-width:0;min-height:127px;padding:12px 5px 10px;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .home-categories .category-icon{width:48px;height:48px;margin:0 0 9px}
+  .home-categories .category-icon svg{width:27px;height:27px}
+  .home-categories .category b{font-size:11px;line-height:1.6}
+  .home-categories .category small{font-size:9px;line-height:1.65;margin-top:3px}
+}
+@media (max-width:360px){
+  .home-categories .category-grid{gap:7px}
+  .home-categories .category{padding-inline:3px;min-height:120px}
+  .home-categories .category b{font-size:10px}
+}
