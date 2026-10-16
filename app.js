@@ -113,7 +113,7 @@ function render({focus=false}={}){
  content.innerHTML=(pages[route]||home)();
  document.querySelectorAll('[data-tab]').forEach(a=>{const active=a.dataset.tab===route||(route==='results'&&a.dataset.tab===params.get('type'));active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#search').value=route==='results'?params.get('q')||'':'';
- document.title=`${({home:'سوق بيت الريف',categories:'كل الأقسام',results:'البحث في السوق',detail:'معاينة تفاصيل البطاقة',store:'معاينة المتجر',journey:'نموذج عمل السوق',info:'دليل السوق',policy:'السياسات',owner:'لأصحاب الأعمال',sitemap:'خريطة الموقع'})[route]||'سوق بيت الريف'} — نموذج تطوير`;
+ document.title=`${({home:'سوق بيت الريف',categories:'كل الأقسام',results:'البحث في السوق',detail:'معاينة تفاصيل البطاقة',store:'معاينة المتجر',journey:'نموذج عمل السوق',info:'دليل السوق',policy:'السياسات',owner:'لأصحاب الأعمال',sitemap:'خريطة الموقع'})[route]||'سوق بيت الريف'} — نظام اختبار`;
  closeMenu();if(focus){window.scrollTo({top:0,behavior:'instant'});content.focus({preventScroll:true});}
  bindPage(params);
 }
