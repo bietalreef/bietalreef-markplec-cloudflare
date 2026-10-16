@@ -102,7 +102,7 @@ function renderFooter() {
   const groups = [
     ...footerSections.map(section=>({name:section.title,links:section.links.map(([label,href])=>link(label,href))})),
     {name:'التصنيفات',links:categories.map(c=>link(c.name,`#results?category=${c.id}`))},
-    {name:'المدن والمناطق',links:cities.slice(1).map(c=>`<button type="button" data-drawer-city="${escapeHTML(c)}">${escapeHTML(c)} ${icon('pin')}</button>`)}
+    {name:'المدن والمناطق',links:cities.slice(1).map(c=>`<a href="#results" data-drawer-city="${escapeHTML(c)}">${escapeHTML(c)} ${icon('pin')}</a>`)}
   ];
   footer.innerHTML = `<div class="footer-guide-top"><span>كل ما تحتاجه عن السوق</span><button type="button" data-footer-top>العودة للأعلى ↑</button></div><div class="footer-guide-grid">${groups.map(group=>`<details class="footer-guide-group"><summary>${escapeHTML(group.name)} <span aria-hidden="true">⌄</span></summary><div class="footer-guide-links">${group.links.join('')}</div></details>`).join('')}</div><nav class="footer-legal" aria-label="السياسات والروابط المهمة"><a href="#policy?slug=privacy">الخصوصية</a><a href="#policy?slug=legal">شروط الاستخدام</a><a href="#policy?slug=cookies">ملفات الارتباط</a><a href="#info?slug=data-protection">حماية البيانات</a><a href="#sitemap">خريطة الموقع</a></nav>`;
 }
