@@ -1,0 +1,158 @@
+/* Biet Alreef responsive refinements: preserve the existing market identity and components. */
+:root { --tap-size: 44px; }
+body { overflow-wrap: anywhere; }
+#content { min-width:0; }
+a, button, summary { -webkit-tap-highlight-color: transparent; }
+.button, .icon-button, .location, .menu-trigger, .footer-guide-group summary { min-height: var(--tap-size); }
+.footer-guide-grid { align-items: start; }
+.footer-guide-group { align-self: start; min-height:0; }
+.footer-guide-links { min-width:0; }
+.footer-guide-links a,.footer-guide-links button { min-height:40px; font-size:13px; }
+.footer-page-body,.footer-policy-section { overflow-wrap:break-word; }
+.footer-page-hero h1 { line-height:1.45; text-wrap:balance; }
+.footer-page-hero p { font-size:clamp(13px,1.35vw,16px); line-height:1.85; }
+.footer-fact p,.footer-policy-section p,.footer-policy-section li { line-height:1.85; }
+.preview-strip { line-height:1.6; }
+/* Give the existing interior artwork dimensionality without a video download. */
+.hero-art { perspective: 940px; isolation:isolate; }
+.hero-art::after {
+  content:""; position:absolute; z-index:0; inset:0;
+  background:linear-gradient(130deg,rgba(255,255,255,.14),transparent 34%,rgba(28,57,36,.04) 100%);
+  pointer-events:none;
+}
+.room-art { z-index:1; transform:rotateY(-5deg) rotateX(2deg) translate3d(0,0,12px) scale(1.025);
+  transform-style:preserve-3d; will-change:transform; transition:transform .8s ease,filter .8s ease;
+  filter:drop-shadow(8px 16px 11px rgba(28,46,33,.17));
+}
+.hero-art:hover .room-art,.hero-art:focus-within .room-art {
+  transform:rotateY(2deg) rotateX(0deg) translate3d(0,-4px,16px) scale(1.05);
+  filter:drop-shadow(5px 19px 13px rgba(28,46,33,.19));
+}
+.art-label { z-index:2; }
+.hero h1 { text-wrap:balance; letter-spacing:-.6px; line-height:1.45; }
+.hero-copy p { max-width:42ch; }
+.hero-cta .button { white-space:nowrap; }
+.category { min-width:0; }
+.category b { line-height:1.6; text-wrap:balance; }
+.category small { line-height:1.65; }
+.trust-item { min-width:0; }
+.trust-item span { min-width:0; }
+.trust-item small { display:block; line-height:1.65; }
+.empty { max-width:100%; }
+
+/* Tablet: readable categories, a shorter hero, and no empty stretched footer columns. */
+@media (min-width:721px) and (max-width:1100px) {
+  .header-top { min-height:86px; }
+  .hero { min-height:340px; }
+  .hero-copy { padding:clamp(22px,3vw,34px); }
+  .hero h1 { font-size:clamp(28px,3.2vw,38px); }
+  .hero-art { min-height:335px; }
+  .category-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .category { padding:15px 10px 13px; }
+  .category b { font-size:13px; }
+  .category small { font-size:11px; }
+  .footer-guide-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+/* Mobile: the shopper sees search, a compact statement and categories without dead space. */
+@media (max-width:720px) {
+  .wrap { width:calc(100% - 28px); }
+  .preview-strip { min-height:30px; padding:5px 14px; gap:10px; font-size:10px; }
+  .preview-strip button { font-size:10px; line-height:1.5; }
+  .header-top { gap:10px 8px; padding-block:12px; }
+  .identity { min-width:0; }
+  .brand { font-size:clamp(17px,4.6vw,20px); }
+  .brand small { font-size:10px; line-height:1.5; letter-spacing:0; }
+  .brand-symbol,.brand-symbol svg { width:32px; height:36px; }
+  .header-actions { margin-inline-start:auto; }
+  .location { padding:0 4px; min-height:44px; }
+  .location b { font-size:12px; }
+  .location small { font-size:10px; }
+  .search { width:100%; flex-basis:100%; order:3; margin-top:2px; min-height:48px; padding:3px 4px 3px 10px; }
+  .search input { min-height:40px; font-size:13px; }
+  .search button { min-height:40px; font-size:12px; padding-inline:20px; }
+  .top-nav { height:46px; gap:24px; font-size:12px; padding-inline:0; scroll-snap-type:x proximity; }
+  .top-nav a { min-height:44px; scroll-snap-align:start; }
+  .hero { margin-top:14px; border-radius:19px; min-height:0; }
+  .hero-copy { padding:21px 20px 15px; }
+  .hero h1 { margin:10px 0; font-size:clamp(26px,7vw,35px); line-height:1.48; letter-spacing:-.3px; }
+  .hero-copy p { font-size:13px; line-height:1.78; margin:7px 0 15px; max-width:39ch; }
+  .eyebrow { font-size:10px; line-height:1.5; letter-spacing:0; }
+  .hero-cta { gap:12px; flex-wrap:wrap; }
+  .hero-cta .button { min-height:44px; font-size:12px; padding:9px 18px; }
+  .hero-cta .text-link { font-size:12px; }
+  .hero-art { min-height:175px; max-height:210px; border-radius:0 0 19px 19px; }
+  .hero-art .room-art { transform:translate3d(0,0,2px) scale(1.015); filter:drop-shadow(5px 10px 8px rgba(27,49,35,.15)); }
+  .hero-art:hover .room-art { transform:translate3d(0,-2px,3px) scale(1.02); }
+  .art-label { left:12px; top:10px; font-size:10px; }
+  .section { padding-block:21px; }
+  .section-head { gap:10px; margin-bottom:14px; }
+  .section-head h2 { font-size:19px; line-height:1.55; }
+  .section-head p { font-size:12px; line-height:1.6; margin-top:3px; }
+  .section-head a { font-size:12px; white-space:nowrap; }
+  .category-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .category { min-height:136px; padding:14px 9px 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+  .category-icon { width:50px; height:50px; margin-bottom:7px; }
+  .category-icon svg { width:27px; height:27px; }
+  .category b { font-size:13px; line-height:1.55; }
+  .category small { font-size:11px; line-height:1.65; margin-top:4px; }
+  .discovery-grid { gap:12px; }
+  .discovery-card { min-height:128px; padding:19px; }
+  .discovery-card h3 { font-size:19px; line-height:1.55; }
+  .discovery-card p { font-size:12px; line-height:1.7; }
+  .discovery-card .big-icon { width:56px; height:56px; }
+  .empty { padding:24px 15px; }
+  .empty h3 { font-size:17px; }
+  .empty p { font-size:13px; line-height:1.85; }
+  .empty-actions { gap:8px; }
+  .empty-actions .button { min-height:44px; font-size:12px; }
+  .trust-strip { margin-block:8px 24px; padding:12px; grid-template-columns:1fr; gap:0; }
+  .trust-item { justify-content:flex-start; gap:12px; padding:10px 5px; }
+  .trust-item + .trust-item { border-top:1px solid #dfe7de; }
+  .trust-item b { font-size:13px; }
+  .trust-item small { font-size:11px; }
+  .trust-item svg { width:22px; height:22px; }
+  .footer { padding-top:7px; }
+  .footer-guide-top { padding:12px 0; }
+  .footer-guide-top span { font-size:16px; }
+  .footer-guide-grid { grid-template-columns:1fr; gap:9px; }
+  .footer-guide-group summary { padding:13px 17px; min-height:49px; font-size:14px; }
+  .footer-guide-links { max-height:none; padding:5px 10px 9px; }
+  .footer-guide-links a,.footer-guide-links button { padding:10px 12px; font-size:13px; min-height:44px; }
+  .footer-legal { padding-block:15px; gap:8px 18px; line-height:1.65; }
+  .footer-legal a { font-size:12px; padding:5px 0; }
+  .footer-inner { gap:10px; padding:17px 0; }
+  .footer-inner>small { padding-top:10px; }
+  .footer-document { padding-top:15px; padding-bottom:38px; }
+  .footer-page-hero { padding:22px 18px; }
+  .footer-page-hero h1 { font-size:clamp(23px,6.5vw,30px); line-height:1.5; }
+  .footer-page-body { margin-top:22px; }
+  .footer-facts { gap:9px; }
+  .footer-fact { padding:15px 17px; min-height:0; }
+  .footer-fact p { font-size:13px; }
+  .footer-policy-section { padding:17px; }
+  .footer-policy-section p,.footer-policy-section li { font-size:13px; }
+  .footer-map-links { gap:8px; }
+  .footer-map-links a { min-height:46px; padding:12px 14px; }
+  #side-menu { width:min(360px,100vw); }
+  .drawer-head { padding:20px; }
+  #drawer-nav { padding:10px 16px; }
+  #drawer-nav a { min-height:44px; font-size:13px; }
+  #drawer-nav summary { min-height:44px; font-size:13px; }
+  #location-dialog { max-height:calc(100dvh - 28px); overflow-y:auto; }
+}
+@media (max-width:370px) {
+  .wrap { width:calc(100% - 22px); }
+  .header-top { padding-block:10px; }
+  .brand { font-size:17px; }
+  .hero-copy { padding:17px 16px 13px; }
+  .hero h1 { font-size:25px; }
+  .hero-art { min-height:145px; max-height:160px; }
+  .category { padding:10px 6px; min-height:127px; }
+  .category b { font-size:12px; }
+  .category small { font-size:10px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .room-art,.hero-art:hover .room-art { transition:none; transform:none; filter:none; }
+  html { scroll-behavior:auto; }
+}
