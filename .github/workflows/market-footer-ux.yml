@@ -1,0 +1,58 @@
+name: Market test footer and UX checks
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feat/test-market-footer-ux-20261016]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ui-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build isolated nonindexed market application
+        run: npm run build:test-worker
+      - name: Verify footer and existing templates
+        run: npm test
+
+  publish-test-only:
+    name: Publish only to market TEST Pages project
+    needs: [ui-checks]
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/feat/test-market-footer-ux-20261016'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: market-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build test assets
+        run: npm run build:test-worker
+      - name: Ensure Cloudflare Pages permission exists
+        env:
+          CF_DEPLOY_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CF_DEPLOY_TOKEN" ]; then
+            echo "::error::The Cloudflare Pages:Edit token is not connected to GitHub Actions. Test deployment is blocked."
+            exit 1
+          fi
+      - name: Deploy to the isolated TEST Pages project only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: d92a08c373516b0609290bf31c5c8a47
+        run: |
+          npx --yes wrangler@4 pages deploy dist --project-name=bietalreef-market-staging --branch=main --commit-hash="$GITHUB_SHA" --commit-message="Test market: footer pages and UX"
+      - name: Verify test URL is serving the new assets
+        run: |
+          curl --fail --show-error --silent --retry 3 --retry-delay 3 https://bietalreef-market-staging.pages.dev/footer-pages.js -o /tmp/footer-pages.js
+          grep -q 'footerSections' /tmp/footer-pages.js
+          curl --fail --show-error --silent https://bietalreef-market-staging.pages.dev/footer-ux.css -o /tmp/footer-ux.css
+          grep -q 'footer-guide-grid' /tmp/footer-ux.css
+          echo "TEST_ONLY_DEPLOYMENT_VERIFIED" >> "$GITHUB_STEP_SUMMARY"

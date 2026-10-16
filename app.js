@@ -1,4 +1,5 @@
 import {resultHref} from './routes.js';
+import {footerSections,infoDocuments,legalDocuments,ownerTopics} from './footer-pages.js';
 // Fresh presentation prototype. No API, account records, payment or publication calls.
 const paths = {
   menu:'M4 6h16M4 12h16M4 18h16', search:'m20 20-5-5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',
@@ -62,13 +63,57 @@ function journeyPage(){return `<div class="wrap">${crumbs('نموذج العمل
  ['03','تُراجع القناة','الظهور في الملف داخل التطبيق مستقل عن مراجعة السوق والمنصة. لا تنشئ الإدارة البطاقات.'],
  ['04','يظهر الأصل نفسه','المعرف والهوية والصور من مصدر موحد. تعرض كل قناة الحقول العامة المسموحة فقط.']
  ].map(([n,h,p])=>`<article class="flow-card"><span class="flow-number">${n}</span><h2>${h}</h2><p>${p}</p></article>`).join('')}</section><div class="section-head"><h2>حدود كل واجهة</h2></div><table class="model-table"><thead><tr><th>الواجهة</th><th>دورها</th><th>الإنشاء والنشر</th></tr></thead><tbody><tr><td>التطبيق الرسمي</td><td>حساب النشاط، الملفات والأدوات والعناصر</td><td>حسب الاستحقاقات الحالية</td></tr><tr><td>السوق المفتوح</td><td>التصفح والبحث وتفاصيل العناصر والنشاط</td><td>يعرض المؤهل لقناة السوق</td></tr><tr><td>المنصة</td><td>عرض تفصيلي للنشاط والخدمات</td><td>وفق مراجعة قناة المنصة</td></tr><tr><td>لوحة الإدارة</td><td>الحسابات والاعتماد والاشتراكات وسجل القرارات</td><td>دون إنشاء أو نشر بطاقات يدويًا</td></tr></tbody></table><div class="section-head"><h2>ما الذي يقدمه هذا النموذج الآن؟</h2></div><ul class="contract-list"><li>رئيسية جديدة، أقسام، بحث وتصفية، تفاصيل بطاقة، وواجهة متجر.</li><li>قائمة يمينية تستجيب للهاتف واللوحي وسطح المكتب، مع دعم لوحة المفاتيح.</li><li>حالات فارغة حقيقية، دون شركات أو أسعار أو تقييمات أو أرقام مصطنعة.</li><li>لا اتصال بقاعدة البيانات أو ملفات Google أو المدفوعات في هذه النسخة.</li><li>الربط القادم يعيد استخدام معرفات وعقود Supabase الحالية بعد مراجعتها.</li></ul><div class="note">النسخة للتطوير وغير قابلة للفهرسة. روابط الإنتاج المفهرسة باقية على النظام الحالي، وخطة مطابقتها مطلوبة قبل أي انتقال.</div><section class="section"><a href="#home" class="button primary">العودة لاكتشاف السوق ${icon('arrow')}</a></section></div>`;}
+function informationPage(params) {
+  const slug = params.get('slug') || 'about';
+  const doc = Object.hasOwn(infoDocuments, slug) ? infoDocuments[slug] : null;
+  if (!doc) return missingFooterPage();
+  return `<div class="wrap footer-document">${crumbs(doc.arTitle)}<section class="footer-page-hero"><span class="footer-eyebrow">دليل سوق بيت الريف</span><h1>${escapeHTML(doc.arTitle)}</h1><p>${escapeHTML(doc.arIntro)}</p></section><section class="footer-page-body" aria-label="التفاصيل"><h2>ما الذي تحتاج إلى معرفته؟</h2><div class="footer-facts">${doc.arItems.map((v,n) => `<article class="footer-fact"><span aria-hidden="true">${String(n+1).padStart(2,'0')}</span><p>${escapeHTML(v)}</p></article>`).join('')}</div><aside class="footer-help"><span>هل تحتاج إلى مساعدة؟</span><a href="#info?slug=customer-service" class="button primary">مركز المساعدة ${icon('arrow')}</a></aside></section></div>`;
+}
+
+function policyPage(params) {
+  const slug = params.get('slug') || 'privacy';
+  const doc = Object.hasOwn(legalDocuments, slug) ? legalDocuments[slug] : null;
+  if (!doc) return missingFooterPage();
+  const official = slug === 'legal' ? 'legal' : slug === 'cookies' ? 'cookies' : 'privacy';
+  return `<div class="wrap footer-document">${crumbs(doc.title)}<section class="footer-page-hero"><span class="footer-eyebrow">${escapeHTML(doc.badge)}</span><h1>${escapeHTML(doc.title)}</h1><p>${escapeHTML(doc.intro)}</p><a class="footer-official-link" href="https://app.bietalreef.ae/${official}" target="_blank" rel="noopener noreferrer">عرض السياسة الحالية على السوق الرسمي ↗</a></section><section class="footer-policy" aria-label="نص السياسة">${doc.sections.map((part,index) => `<article class="footer-policy-section" id="policy-part-${index+1}"><h2>${escapeHTML(part.title)}</h2>${(part.paragraphs || []).map(p=>`<p>${escapeHTML(p)}</p>`).join('')}${part.items?.length ? `<ul>${part.items.map(item=>`<li>${escapeHTML(item)}</li>`).join('')}</ul>` : ''}</article>`).join('')}</section></div>`;
+}
+
+function ownerInfoPage(params) {
+  const topic = params.get('topic') || 'join';
+  const page = Object.hasOwn(ownerTopics, topic) ? ownerTopics[topic] : null;
+  if (!page) return missingFooterPage();
+  return `<div class="wrap footer-document">${crumbs(page.title)}<section class="footer-page-hero"><span class="footer-eyebrow">لأصحاب الأعمال</span><h1>${escapeHTML(page.title)}</h1><p>${escapeHTML(page.text)}</p></section><section class="footer-page-body"><h2>ابدأ من حساب نشاطك</h2><p>جميع خطوات إنشاء متجرك وإدارة محتواه تتم من مساحة أعمالك نفسها. يمكنك مراجعة المتجر قبل نشر العناصر المؤهلة.</p><div class="footer-owner-actions"><a class="button primary" href="https://providers.bietalreef.ae" target="_blank" rel="noopener noreferrer">افتح مساحة أعمالك ${icon('arrow')}</a><a class="button secondary" href="#info?slug=publication-policy">سياسة النشر</a></div></section></div>`;
+}
+
+function missingFooterPage() {
+  return `<div class="wrap footer-document">${crumbs('صفحة غير متاحة')}<section class="footer-page-hero"><h1>لم نعثر على هذه الصفحة</h1><p>يمكنك متابعة التصفح أو العودة إلى أقسام السوق.</p><a href="#home" class="button primary">العودة للسوق ${icon('arrow')}</a></section></div>`;
+}
+
+function footerSitemap() {
+  const links = [...footerSections.flatMap(s=>s.links.map(([title,href])=>({title,href}))),{title:'الخصوصية',href:'#policy?slug=privacy'},{title:'شروط الاستخدام',href:'#policy?slug=legal'},{title:'ملفات الارتباط',href:'#policy?slug=cookies'}];
+  const unique = [...new Map(links.map(l=>[l.href,l])).values()];
+  return `<div class="wrap footer-document">${crumbs('خريطة الموقع')}<section class="footer-page-hero"><span class="footer-eyebrow">دليلك إلى السوق</span><h1>خريطة الموقع</h1><p>جميع صفحات المساعدة والأقسام في مكان واحد.</p></section><nav class="footer-map-links" aria-label="خريطة الموقع">${unique.map(l=>`<a href="${escapeHTML(l.href)}">${escapeHTML(l.title)} ${icon('arrow')}</a>`).join('')}</nav></div>`;
+}
+
+function renderFooter() {
+  const footer = document.querySelector('#footer-guide');
+  if (!footer) return;
+  const link = (label,href)=>`<a href="${escapeHTML(href)}">${escapeHTML(label)} ${icon('arrow')}</a>`;
+  const groups = [
+    ...footerSections.map(section=>({name:section.title,links:section.links.map(([label,href])=>link(label,href))})),
+    {name:'التصنيفات',links:categories.map(c=>link(c.name,`#results?category=${c.id}`))},
+    {name:'المدن والمناطق',links:cities.slice(1).map(c=>`<a href="#results" data-drawer-city="${escapeHTML(c)}">${escapeHTML(c)} ${icon('pin')}</a>`)}
+  ];
+  footer.innerHTML = `<div class="footer-guide-top"><span>كل ما تحتاجه عن السوق</span><button type="button" data-footer-top>العودة للأعلى ↑</button></div><div class="footer-guide-grid">${groups.map(group=>`<details class="footer-guide-group"><summary>${escapeHTML(group.name)} <span aria-hidden="true">⌄</span></summary><div class="footer-guide-links">${group.links.join('')}</div></details>`).join('')}</div><nav class="footer-legal" aria-label="السياسات والروابط المهمة"><a href="#policy?slug=privacy">الخصوصية</a><a href="#policy?slug=legal">شروط الاستخدام</a><a href="#policy?slug=cookies">ملفات الارتباط</a><a href="#info?slug=data-protection">حماية البيانات</a><a href="#sitemap">خريطة الموقع</a></nav>`;
+}
+
 function render({focus=false}={}){
  const [route,raw='']=(location.hash.slice(1)||'home').split('?');const params=new URLSearchParams(raw);
- const pages={home, categories:categoriesPage, results:()=>resultsPage(params),detail:()=>detailPage(params),store:storePage,journey:journeyPage};
+ const pages={home, categories:categoriesPage, results:()=>resultsPage(params),detail:()=>detailPage(params),store:storePage,journey:journeyPage,info:()=>informationPage(params),policy:()=>policyPage(params),owner:()=>ownerInfoPage(params),sitemap:footerSitemap};
  content.innerHTML=(pages[route]||home)();
  document.querySelectorAll('[data-tab]').forEach(a=>{const active=a.dataset.tab===route||(route==='results'&&a.dataset.tab===params.get('type'));active?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current');});
  document.querySelector('#search').value=route==='results'?params.get('q')||'':'';
- document.title=`${({home:'سوق بيت الريف',categories:'كل الأقسام',results:'البحث في السوق',detail:'معاينة تفاصيل البطاقة',store:'معاينة المتجر',journey:'نموذج عمل السوق'})[route]||'سوق بيت الريف'} — نموذج تطوير`;
+ document.title=`${({home:'سوق بيت الريف',categories:'كل الأقسام',results:'البحث في السوق',detail:'معاينة تفاصيل البطاقة',store:'معاينة المتجر',journey:'نموذج عمل السوق',info:'دليل السوق',policy:'السياسات',owner:'لأصحاب الأعمال',sitemap:'خريطة الموقع'})[route]||'سوق بيت الريف'} — نظام اختبار`;
  closeMenu();if(focus){window.scrollTo({top:0,behavior:'instant'});content.focus({preventScroll:true});}
  bindPage(params);
 }
@@ -102,7 +147,9 @@ document.addEventListener('click',e=>{
  if(target.dataset.drawerCity){city=target.dataset.drawerCity;refreshCity();closeMenu();if(location.hash==='#results')render({focus:true});}
  if(target.dataset.route){if(location.hash==='#'+target.dataset.route)render({focus:true});else location.hash=target.dataset.route;}
  if(target.closest('#drawer-nav')&&target.tagName==='A')closeMenu();
+ if(target.hasAttribute('data-footer-top'))window.scrollTo({top:0,behavior:'smooth'});
  if(target.hasAttribute('data-preview-action')){const toast=document.querySelector('#toast');toast.textContent='معاينة فقط — لم يُرسل طلب ولم تُنشأ أي بيانات.';toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,4000);}
 });
 window.addEventListener('hashchange',()=>render({focus:true}));
+renderFooter();
 render();
