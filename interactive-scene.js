@@ -24,7 +24,7 @@ export const sceneItems = [
     id: 'rug', label: 'السجاد والديكور', kind: 'offer', kindLabel: 'عروض',
     title: 'لمسة تكمل المكان', detail: 'تصفح العروض المتاحة على مستلزمات المنزل عند نشرها.',
     action: 'شاهد العروض', href: '#results?type=offer',
-    coords: {wide: [47, 85], mobile: [53, 84]},
+    coords: {wide: [67, 85], mobile: [52, 85]},
   },
 ];
 export const sceneStatus = 'discovery-only'; // No inventory, availability, price, or discount claims.
