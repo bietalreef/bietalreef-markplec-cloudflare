@@ -6,7 +6,7 @@ export const sceneItems = [
     id: 'sofa', label: 'الأريكة', kind: 'product', kindLabel: 'منتج',
     title: 'مساحة تعكس ذوقك', detail: 'استكشف الأرائك والأثاث المناسب لمساحتك.',
     action: 'استكشف الأثاث', href: '#results?type=product&category=furniture',
-    coords: {wide: [41, 62], mobile: [48, 62]},
+    coords: {wide: [64, 63], mobile: [48, 69]},
   },
   {
     id: 'lighting', label: 'الإضاءة', kind: 'product', kindLabel: 'منتج',
