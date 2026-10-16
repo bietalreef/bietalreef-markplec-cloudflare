@@ -4,6 +4,7 @@ on:
     branches: [main]
   push:
     branches: [feat/test-market-footer-ux-20261016]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -23,7 +24,7 @@ jobs:
   publish-test-only:
     name: Publish only to market TEST Pages project
     needs: [ui-checks]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/test-market-footer-ux-20261016'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/feat/test-market-footer-ux-20261016'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: market-test
