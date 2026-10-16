@@ -55,3 +55,25 @@ test('all assets copied into nonindexed worker build',async()=>{
  assert.match(worker,/noindex, nofollow, noarchive/);
  assert.doesNotMatch(worker,/SUPABASE_SERVICE_ROLE_KEY|PRIVATE_API_KEY/);
 });
+
+
+test('the real original room photograph has separate tablet and phone assets',async()=>{
+ const app=await readFile('dist/app.js','utf8');
+ const photos=await readFile('dist/scene-images.js','utf8');
+ const css=await readFile('dist/showcase.css','utf8');
+ const html=await readFile('dist/index.html','utf8');
+ assert.match(app,/import \{sceneImages\} from '\.\/scene-images\.js'/);
+ assert.match(app,/<picture class="hero-photograph">/);
+ assert.match(app,/sceneImages\.mobile/);
+ assert.match(app,/sceneImages\.wide/);
+ assert.match(app,/room-discovery-track/);
+ assert.match(photos,/data:image\/webp;base64,UklG/);
+ const matches=photos.match(/data:image\/webp;base64,UklG/g)||[];
+ assert.equal(matches.length,2);
+ assert.ok(photos.length>100000,'must be genuine optimized photo files, not placeholder URLs');
+ assert.match(html,/href="\/showcase\.css"/);
+ assert.match(css,/hero-photograph img/);
+ assert.match(css,/hero-photo>\.hero-copy/);
+ assert.match(css,/min-height:510px/);
+ assert.match(css,/prefers-reduced-motion/);
+});
