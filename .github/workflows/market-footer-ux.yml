@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Build isolated market preview
-        run: npm run build
+      - name: Build isolated nonindexed market application
+        run: npm run build:test-worker
       - name: Verify footer and existing templates
         run: npm test
 
@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: '22'
       - name: Build test assets
-        run: npm run build
+        run: npm run build:test-worker
       - name: Ensure Cloudflare Pages permission exists
         env:
           CF_DEPLOY_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
