@@ -1,0 +1,19 @@
+name: Approved category cards — responsive test
+on:
+  push:
+    branches: [feat/approved-category-photos-test-20261016]
+  pull_request:
+    branches: [feat/responsive-shoppable-scene-guest-20261016]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run build:test-worker
+      - run: npm test
