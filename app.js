@@ -1,4 +1,6 @@
 import {resultHref} from './routes.js';
+import {sceneItems} from './interactive-scene.js';
+import {sceneImages} from './scene-images.js';
 import {footerSections,infoDocuments,legalDocuments,ownerTopics} from './footer-pages.js';
 // Public shopping experience: keep buyer-facing copy warm and avoid developer notices.
 const paths = {
@@ -44,8 +46,30 @@ function emptyState({title='اختيارات جديدة قريبًا',text='نع
  return `<div class="empty"><span class="empty-symbol">${icon('box')}</span><h3>${title}</h3><p>${text}</p><div class="empty-actions">${template?'<a class="button secondary" href="#detail?type=product">استكشف التفاصيل '+icon('arrow')+'</a>':''}<a class="button primary" href="#categories">تصفح الأقسام</a></div></div>`;
 }
 const crumbs=label=>`<nav class="breadcrumbs" aria-label="مسار الصفحة"><a href="#home">السوق</a><span aria-hidden="true">/</span><span>${escapeHTML(label)}</span></nav>`;
+// Hotspots are public category guides, never invented products or transactions.
+const sceneButtons=()=>sceneItems.map(item=>`<button type="button" class="scene-spot" data-scene="${item.id}" aria-label="${escapeHTML(item.label)} — ${escapeHTML(item.kindLabel)}" title="${escapeHTML(item.label)}" style="--wide-x:${item.coords.wide[0]}%;--wide-y:${item.coords.wide[1]}%;--mobile-x:${item.coords.mobile[0]}%;--mobile-y:${item.coords.mobile[1]}%"><span class="scene-spot-dot" aria-hidden="true">+</span><span class="scene-spot-caption">${escapeHTML(item.label)}</span></button>`).join('');
+function showSceneDetail(item){
+  const panel=document.getElementById('scene-dialog');
+  if(!panel||!item)return;
+  const heading=document.getElementById('scene-dialog-title');
+  const body=document.getElementById('scene-dialog-body');
+  heading.textContent=item.title;
+  body.textContent=item.detail;
+  document.getElementById('scene-dialog-kind').textContent=item.kindLabel;
+  const link=document.getElementById('scene-dialog-link');
+  link.href=item.href;
+  link.textContent=item.action;
+  if(typeof panel.showModal==='function'&&!panel.open)panel.showModal();
+}
 function home(){
- return `<div class="wrap"><section class="hero"><div class="hero-copy"><div class="eyebrow">بيتك، بطريقتك</div><h1>كل ما يحتاجه بيتك،<br><em>في مكان واحد.</em></h1><p>من قطعة أثاث تحبها إلى خدمة تحتاجها، ستجد اختيارات بيتك في مكان واحد.</p><div class="hero-cta"><a href="#categories" class="button primary">اكتشف الأقسام ${icon('arrow')}</a><a href="#journey" class="text-link">تعرف على السوق</a></div></div><div class="hero-art"><span class="art-label">تخيّل مساحتك</span><div class="room-art">${roomArt}</div></div></section><section class="section" aria-labelledby="categories-title"><div class="section-head"><div><h2 id="categories-title">ابدأ بما تبحث عنه</h2><p>ابدأ بما تحب، ونحن نسهّل عليك الباقي.</p></div><a href="#categories">كل الأقسام ←</a></div><div class="category-grid">${categoryLinks()}</div></section><section class="discovery-grid" aria-label="مسارات الاكتشاف"><article class="discovery-card"><div><span class="eyebrow">للبيت والحياة</span><h3>تفاصيل تشبهك.</h3><p>استكشف أقسام الأثاث والديكور والتجهيزات.</p><a class="text-link" href="#results?type=product">استكشف المنتجات ←</a></div><span class="big-icon">${icon('sofa')}</span></article><article class="discovery-card"><div><span class="eyebrow">للعمل والإنجاز</span><h3>خدمة تبدأ باحتياجك.</h3><p>من الصيانة إلى التصميم وتنفيذ الأعمال.</p><a class="text-link" href="#results?type=service">استكشف الخدمات ←</a></div><span class="big-icon">${icon('tools')}</span></article></section><section class="section"><div class="section-head"><div><h2>مساحة لاختياراتك القادمة</h2><p>مساحة جديدة لاكتشاف المنتجات والخدمات.</p></div><a href="#results">استعراض السوق ←</a></div>${emptyState()}</section><section class="trust-strip" aria-label="مبادئ التجربة"><div class="trust-item">${icon('search')}<span><b>تصفح بدون تسجيل</b><small>ابدأ البحث مباشرة.</small></span></div><div class="trust-item">${icon('layers')}<span><b>متاجر في مكان واحد</b><small>تعرّف على الأنشطة القريبة منك.</small></span></div><div class="trust-item">${icon('shield')}<span><b>اختيارات موثوقة</b><small>تعرف على النشاط قبل التواصل معه.</small></span></div></section></div>`;
+ return `<div class="wrap"><section class="hero hero-photo"><div class="hero-copy"><div class="eyebrow">تجربة تناسب ذوقك</div><h1>كل ما يحتاجه بيتك،<br><em>في مكان واحد.</em></h1><p>اكتشف الأثاث والديكور والخدمات التي يحتاجها بيتك، واستلهم أفكارًا لمساحتك.</p><div class="hero-cta"><a href="#categories" class="button primary">اكتشف الأقسام ${icon('arrow')}</a><a href="#journey" class="text-link">تعرف على السوق</a></div></div><div class="hero-art scene-art" aria-label="استكشف منتجات وخدمات المنزل من خلال الصورة"><picture class="hero-photograph"><source media="(max-width:720px)" srcset="${sceneImages.mobile}"><img src="${sceneImages.wide}" alt="غرفة معيشة عصرية بإضاءة دافئة وأثاث وديكور ونباتات، صورة تصميمية للإلهام" loading="eager" decoding="async" fetchpriority="high"></picture><div class="hero-photograph-shade" aria-hidden="true"></div><span class="art-label">المس العناصر واكتشف تفاصيلها</span><div class="scene-markers" aria-label="عناصر الغرفة">${sceneButtons()}</div></div></section><section class="room-discovery" aria-label="اكتشف حسب مساحة البيت"><div class="section-head"><div><h2>تسوق حسب المساحة</h2><p>أفكار للغرف والتفاصيل التي تحبها.</p></div><a href="#categories">كل الأقسام ←</a></div><div class="room-discovery-track">${[
+{label:'غرفة المعيشة',category:'furniture',pos:'34% 67%'},
+{label:'غرفة الطعام',category:'kitchen',pos:'61% 24%'},
+{label:'الإضاءة',category:'decor',pos:'62% 9%'},
+{label:'الديكور',category:'decor',pos:'83% 45%'},
+{label:'الحديقة',category:'garden',pos:'10% 30%'},
+{label:'التشطيبات',category:'construction',pos:'93% 35%'}
+].map(item=>`<a class="room-discovery-card" href="#results?category=${item.category}"><span class="room-discovery-photo" style="--room-pos:${item.pos}"><img src="${sceneImages.wide}" alt="" loading="lazy" decoding="async"></span><strong>${item.label}</strong></a>`).join('')}</div></section><section class="section" aria-labelledby="categories-title"><div class="section-head"><div><h2 id="categories-title">ابدأ بما تبحث عنه</h2><p>ابدأ بما تحب، ونحن نسهّل عليك الباقي.</p></div><a href="#categories">كل الأقسام ←</a></div><div class="category-grid">${categoryLinks()}</div></section><section class="discovery-grid" aria-label="مسارات الاكتشاف"><article class="discovery-card"><div><span class="eyebrow">للبيت والحياة</span><h3>تفاصيل تشبهك.</h3><p>استكشف أقسام الأثاث والديكور والتجهيزات.</p><a class="text-link" href="#results?type=product">استكشف المنتجات ←</a></div><span class="big-icon">${icon('sofa')}</span></article><article class="discovery-card"><div><span class="eyebrow">للعمل والإنجاز</span><h3>خدمة تبدأ باحتياجك.</h3><p>من الصيانة إلى التصميم وتنفيذ الأعمال.</p><a class="text-link" href="#results?type=service">استكشف الخدمات ←</a></div><span class="big-icon">${icon('tools')}</span></article></section><section class="section"><div class="section-head"><div><h2>مساحة لاختياراتك القادمة</h2><p>مساحة جديدة لاكتشاف المنتجات والخدمات.</p></div><a href="#results">استعراض السوق ←</a></div>${emptyState()}</section><section class="trust-strip" aria-label="مبادئ التجربة"><div class="trust-item">${icon('search')}<span><b>تصفح بدون تسجيل</b><small>ابدأ البحث مباشرة.</small></span></div><div class="trust-item">${icon('layers')}<span><b>متاجر في مكان واحد</b><small>تعرّف على الأنشطة القريبة منك.</small></span></div><div class="trust-item">${icon('shield')}<span><b>اختيارات موثوقة</b><small>تعرف على النشاط قبل التواصل معه.</small></span></div></section></div>`;
 }
 function categoriesPage(){return `<div class="wrap">${crumbs('كل الأقسام')}<h1 class="page-title">مساحات مختلفة. سوق واحد.</h1><p class="page-intro">اختر القسم، ثم خصص نوع العنصر والمدينة للوصول إلى ما يناسبك.</p><section class="section"><div class="category-grid">${categoryLinks()}</div></section><div class="note">استكشف الأقسام واختر ما تبحث عنه بسهولة.</div><section class="section"><div class="section-head"><h2>كيف تحب أن تتصفح؟</h2></div><div class="discovery-grid"><a class="discovery-card" href="#results?type=product"><div><h3>ابحث عن منتج</h3><p>المواصفات، خيارات السعر، ومعلومات المتجر.</p></div><span class="big-icon">${icon('box')}</span></a><a class="discovery-card" href="#results?type=service"><div><h3>ابحث عن خدمة</h3><p>نطاق العمل، مناطق الخدمة، وطريقة التواصل.</p></div><span class="big-icon">${icon('tools')}</span></a></div></section></div>`;}
 function resultsPage(params){
@@ -148,8 +172,33 @@ document.addEventListener('click',e=>{
  if(target.dataset.route){if(location.hash==='#'+target.dataset.route)render({focus:true});else location.hash=target.dataset.route;}
  if(target.closest('#drawer-nav')&&target.tagName==='A')closeMenu();
  if(target.hasAttribute('data-footer-top'))window.scrollTo({top:0,behavior:'smooth'});
+ if(target.dataset.scene){showSceneDetail(sceneItems.find(item=>item.id===target.dataset.scene));}
+ if(target.hasAttribute('data-scene-close'))document.getElementById('scene-dialog')?.close();
  if(target.hasAttribute('data-preview-action')){const toast=document.querySelector('#toast');toast.textContent='هذه الخدمة غير متاحة الآن. يمكنك متابعة استكشاف السوق.';toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.hidden=true,4000);}
 });
+document.getElementById('scene-dialog-link')?.addEventListener('click',()=>document.getElementById('scene-dialog')?.close());
+// A green badge appears only when this public origin answers successfully.
+// This status does not imply a logged-in user, connected WhatsApp or provider API.
+async function verifyPublicConnection(){
+ const badge=document.getElementById('market-connection-status');
+ if(!badge)return;
+ let alive=false;
+ if(navigator.onLine!==false){
+   try{
+     const response=await fetch('/robots.txt',{method:'HEAD',cache:'no-store',signal:AbortSignal.timeout(6000),credentials:'omit'});
+     alive=response.ok;
+   }catch{alive=false;}
+ }
+ badge.classList.toggle('online',alive);
+ badge.classList.toggle('offline',!alive);
+ badge.classList.remove('checking');
+ badge.querySelector('b').textContent=alive?'متصل الآن':'غير متصل';
+}
+window.addEventListener('online',()=>void verifyPublicConnection());
+window.addEventListener('offline',()=>void verifyPublicConnection());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void verifyPublicConnection();});
+void verifyPublicConnection();
+
 window.addEventListener('hashchange',()=>render({focus:true}));
 renderFooter();
 render();
