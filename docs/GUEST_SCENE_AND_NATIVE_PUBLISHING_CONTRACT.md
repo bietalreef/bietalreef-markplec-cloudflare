@@ -10,7 +10,7 @@
 
 ## Responsive scene contract
 - One semantic scene ID; two independently art-directed media assets: wide for desktop/tablet, portrait for phones. Do not rely on cropping an important object out of a generic wide image.
-- Current market demo uses existing SVG artwork as fallback. OpenAI-generated photo concepts require asset approval, optimization and publishing to a cacheable public image CDN before selecting a live `<picture>` source.
+- Current test market uses two WebP renditions derived from the original OpenAI-generated photoreal interior scene via `<picture>` and `scene-images.js`; images are served by the isolated Worker and are not a merchant catalogue or a dynamic image service. Real merchant images require a separately reviewed asset/media publication pipeline.
 - Each item hotspot has a normalized [0..100]% position for **each** art variant, plus a category/type, visible label, accessible description and published-item reference *when one exists*.
 - If item has a real active market publication, its public data and live availability should be queried from the existing read-only market source. If not, a category discovery link is safe; **never fabricate price, review, provider, discount or supply**.
 - All per-image UI interaction stays on the guest surface (tap to bottom sheet on mobile, modal or side panel on wide screens). Hide/disable hotspot on mismatch or missing publication.
@@ -18,7 +18,7 @@
 - True 3D/VR requires a GLB/3D model and camera controls separate from the 2D photographic scene; CSS perspective is not a VR system.
 
 ## Security and indexing
-- The current `market-test.bietalreef.ae` worker is static: GET/HEAD only, no cookies, same-origin health probe, no outbound auth. All routes are `noindex,nofollow,noarchive` and robots.txt disallows crawling.
+- The current `market-test.bietalreef.ae` worker is static: GET/HEAD only, no cookies, same-origin health probe, no outbound auth. Original generated WebP images are intentionally packaged with the test-only build; do not deploy these to public production until visual QA. All routes are `noindex,nofollow,noarchive` and robots.txt disallows crawling.
 - A green `متصل الآن` indicator means **this public domain responded to a same-origin HEAD probe**. It does not mean a logged-in user, connected WhatsApp or operational AI agent.
 - Keep pages isolated from production marketplace, Flutter native routes, Stripe, Google Play/Apple subscriptions and provider account controls.
 
