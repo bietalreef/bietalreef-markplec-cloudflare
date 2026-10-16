@@ -12,7 +12,7 @@ export const sceneItems = [
     id: 'lighting', label: 'الإضاءة', kind: 'product', kindLabel: 'منتج',
     title: 'إضاءة تغيّر الأجواء', detail: 'تعرف على أفكار إضاءة تضيف لمسة خاصة لبيتك.',
     action: 'استكشف الإضاءة', href: '#results?type=product&category=decor',
-    coords: {wide: [11, 34], mobile: [16, 30]},
+    coords: {wide: [55, 25], mobile: [17, 56]},
   },
   {
     id: 'finishing', label: 'الجدران والتشطيبات', kind: 'service', kindLabel: 'خدمة',
