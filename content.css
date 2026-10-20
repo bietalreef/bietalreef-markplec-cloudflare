@@ -1,0 +1,17 @@
+/* Shared customer footer and server-rendered editorial guides. */
+.market-footer{padding:48px 0 24px;background:#183d36;color:#f6f2e9;border-top:4px solid #cbb88f}
+.market-footer a{color:#f6f2e9;text-decoration:none}.market-footer a:hover{text-decoration:underline;text-underline-offset:5px}
+.market-footer a:focus-visible,.guide-page a:focus-visible,.guide-header a:focus-visible{outline:3px solid #cbb88f;outline-offset:5px}
+.market-footer p{color:#e0e6de;line-height:1.9}.footer-intro{max-width:760px;margin-bottom:32px}
+.market-footer .brand{color:#fff}.market-footer .brand-symbol{display:grid;place-items:center;font-size:30px}
+.footer-grid{display:grid;grid-template-columns:1.2fr 1fr 1.2fr 1fr;gap:28px}
+.footer-grid h2{font-size:17px;color:#eddbb7;margin:0 0 14px}.footer-grid ul{list-style:none;padding:0;margin:0}
+.footer-grid li a{display:inline-block;padding:9px 0;font-size:14px;line-height:1.65}
+.area-links{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.footer-note{border-top:1px solid #ffffff30;margin-top:30px;padding-top:20px}.footer-note p{max-width:950px;font-size:13px}
+.guide-header{background:#fff;border-bottom:1px solid #e1e5dc;padding:22px 0}.guide-header>.wrap{display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap}.guide-header nav{display:flex;gap:20px;flex-wrap:wrap}
+.guide-page{max-width:1080px;padding-top:34px;padding-bottom:56px;line-height:1.95;color:#183d36}.guide-page h1{font-size:clamp(28px,4vw,44px);line-height:1.4;margin:24px 0 18px}.guide-lead{font-size:20px;max-width:850px}
+.guide-page section{margin-top:32px}.guide-page h2{font-size:25px;margin-bottom:12px}.guide-page li{margin:10px 0}.guide-page a{color:#245f4f;text-decoration:underline;text-underline-offset:4px}.guide-help{background:#eef1e7;border:1px solid #d7ddcf;border-radius:20px;padding:26px;margin-top:36px}
+.guide-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}.guide-cards article{background:white;border:1px solid #dce2d8;border-radius:16px;padding:24px}.guide-cards h3{font-size:20px;margin:0 0 10px}
+.district-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;list-style:none;padding:0}.district-grid li{padding:16px;border:1px solid #dce2d8;border-radius:12px;scroll-margin-top:25px}.district-grid li:target{background:#e7eddb;outline:2px solid #658267}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.footer-grid,.guide-cards{grid-template-columns:1fr}.district-grid{grid-template-columns:1fr 1fr}.market-footer{padding-top:30px}.guide-page h2{font-size:22px}}
