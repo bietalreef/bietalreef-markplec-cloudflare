@@ -116,4 +116,4 @@ function addFooterCards(){
  const cards=legal?official.slice(0,4):official;
  box.innerHTML='<div class="market-ux-related-head"><div><span>تابع رحلتك في بيت الريف</span><h2>خطوات وروابط مرتبطة بموضوع '+esc(heading)+'</h2></div><p>مرّر أفقيًا لاكتشاف المزيد، أو انتقل مباشرة إلى ما تحتاجه.</p></div>'+
  '<div class="market-ux-scroll" tabindex="0" aria-label="بطاقات مرتبطة">'+cards.map(([label,href,desc])=>
- '<a class="market-ux-scroll-card" hre --- TRUNCATED --- 18,155 chars
+ '<a class="market-ux-scroll-card" hre --- TRUNCATED --- 18,627 chars
