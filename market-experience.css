@@ -1,0 +1,104 @@
+/* Biet Al Reef MARKET: non-destructive enhancements over the existing public worker. */
+.footer-guide-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.footer-guide-group.market-ux-footer-section{border:1px solid #e9e2d6;border-radius:15px;background:#fff;padding:0 0 9px;overflow:visible}
+.market-ux-footer-section h2{font-size:clamp(12px,1.2vw,15px);font-weight:800;margin:0;padding:16px 15px 10px;color:#24354b;line-height:1.6}
+.market-ux-footer-section .footer-guide-links{max-height:none;overflow:visible;display:grid;gap:1px;padding:0 8px}
+.market-ux-footer-section .footer-guide-links a{color:#3d4d56;font-size:clamp(11px,1.02vw,13px);padding:7px;min-height:36px;line-height:1.7}
+.market-ux-footer-section .footer-guide-links a:hover{background:#f5f0e6;color:#20354c}
+.market-ux-specialties{max-width:100%}
+.market-ux-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.market-ux-category,.market-ux-drawer-specialties details{border:1px solid #ddd4c4;border-radius:16px;background:#fff;overflow:hidden}
+.market-ux-category>summary,.market-ux-drawer-specialties summary{list-style:none;cursor:pointer;padding:15px 16px;font-weight:800;color:#24354b}
+.market-ux-category>summary::marker,.market-ux-drawer-specialties summary::marker{content:""}
+.market-ux-category>div{padding:0 14px 15px}
+.market-ux-category[open]{border-color:#b49b67;box-shadow:0 10px 25px #2536470c}
+.market-ux-subgroup h3{font-size:12px;color:#7c6541;margin:12px 0 7px;line-height:1.7}
+.market-ux-subitems{display:flex;flex-wrap:wrap;gap:7px}
+.market-ux-subitems a{display:inline-flex;align-items:center;max-width:100%;min-height:37px;padding:8px 10px;background:#f9f6f0;border:1px solid #e9e1d2;border-radius:10px;font-size:12px;line-height:1.6}
+.market-ux-subitems a:hover,.market-ux-subitems a:focus-visible{background:#eae1d0;border-color:#b49b67}
+.market-ux-mega{position:relative;align-self:center;z-index:30}
+.market-ux-mega>summary{list-style:none;cursor:pointer;font-size:13px;font-weight:800;padding:10px 12px;min-height:44px;white-space:nowrap}
+.market-ux-mega-panel{position:absolute;top:100%;right:-130px;width:min(1000px,94vw);max-height:min(73vh,700px);overflow:auto;background:white;border:1px solid #e6ddce;border-radius:17px;box-shadow:0 20px 60px #18273c22;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding:22px}
+.market-ux-mega:not([open]) .market-ux-mega-panel{display:none}
+.market-ux-mega-panel>section{min-width:0}
+.market-ux-mega-panel h2{font-size:13px;font-weight:800;color:#24354b;margin:0 0 12px}
+.market-ux-mega-panel .market-ux-subitems{flex-direction:column;align-items:stretch}
+.market-ux-mega-panel .market-ux-subitems a{width:100%}
+.market-ux-drawer-specialties{display:grid;gap:8px;margin-top:18px}
+.market-ux-drawer-specialties h3{margin:8px 0}
+.market-ux-drawer-specialties details>div{padding:10px}
+.market-ux-filter-summary{padding:13px 16px;border:1px solid #e9d9af;background:#fffbef;border-radius:13px;font-size:13px}
+.market-ux-empty-link{display:inline-block;margin-top:15px;padding:12px 15px;border-radius:12px;color:#20354c;background:#eee7d8;font-weight:700;font-size:13px}
+.market-ux-related{margin:35px 0 55px}
+.market-ux-related-head{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.market-ux-related-head span{color:#9b7a3f;font-weight:800;font-size:12px}
+.market-ux-related-head h2{font-size:clamp(20px,2.5vw,29px);line-height:1.6;color:#24354b;margin:7px 0 0}
+.market-ux-related-head p{font-size:13px;color:#626e70}
+.market-ux-scroll{display:flex;gap:13px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:6px 3px 22px;overscroll-behavior-inline:contain}
+.market-ux-scroll-card{flex:0 0 clamp(220px,27vw,310px);scroll-snap-align:start;border:1px solid #e6ddcd;border-radius:19px;padding:21px;background:#fff;min-height:178px;display:flex;flex-direction:column;gap:11px}
+.market-ux-scroll-card strong{font-size:16px;color:#24354b}
+.market-ux-scroll-card p{font-size:13px;color:#5f6b6f;line-height:1.85;margin:0;flex:1}
+.market-ux-scroll-card span{color:#a17b35;font-weight:800}
+.market-ux-bottom-cta{margin-top:22px;border:1px solid #e2d2b9;border-radius:18px;padding:clamp(18px,3vw,30px);background:#f7f1e7;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.market-ux-bottom-cta h3{font-size:20px;margin:0 0 7px;color:#20354c}
+.market-ux-bottom-cta p{font-size:13px;line-height:1.9;margin:0;color:#4e5d65}
+.market-ux-bottom-cta a{padding:13px 19px;border-radius:13px;background:#20354c;color:white;font-weight:800}
+.market-ux-store-guidance{margin:20px 0 35px}
+.market-ux-store-guidance h2{font-size:clamp(19px,3vw,25px);color:#20354c}
+.market-ux-tip-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.market-ux-tip-grid article{border:1px solid #e8dfd1;background:#fff;border-radius:14px;padding:18px}
+.market-ux-tip-grid h3{margin:0 0 6px;font-size:15px}
+.market-ux-tip-grid p,.market-ux-note{font-size:12px;color:#566365;line-height:1.9}
+.market-ux-taxonomy-status{font-size:11px;color:#826c4c}
+@media(max-width:1050px){.market-ux-mega{display:none}.market-ux-six{grid-template-columns:repeat(2,minmax(0,1fr))}.market-ux-tip-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.market-ux-six{grid-template-columns:repeat(2,minmax(0,1fr))}.market-ux-category>summary{font-size:12px;padding:12px}.market-ux-category>div{padding:0 9px 10px}.market-ux-subitems a{font-size:11px;min-height:36px}.market-ux-scroll-card{flex-basis:min(80vw,290px)}.market-ux-bottom-cta{align-items:stretch}.market-ux-bottom-cta a{text-align:center}.footer-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-guide-group.market-ux-footer-section{padding-bottom:5px}.market-ux-footer-section h2{font-size:12px;padding:13px 10px 8px}.market-ux-footer-section .footer-guide-links a{font-size:11px;line-height:1.65;min-height:36px;padding:7px 4px}.market-ux-footer-section .footer-guide-links svg{width:12px;height:12px}}
+@media(max-width:350px){.market-ux-six{grid-template-columns:1fr}.market-ux-tip-grid{grid-template-columns:1fr}.market-ux-footer-section h2{font-size:11px}.market-ux-footer-section .footer-guide-links a{font-size:10px;gap:3px}}
+@media(prefers-reduced-motion:reduce){.market-ux-scroll{scroll-behavior:auto}}
+
+
+/* BR Market 2026: clear, open editorial footer with ALL established sections and hrefs. */
+.footer{background:#fff!important}
+.footer .footer-guide-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:34px 24px;align-items:start}
+.footer .footer-guide-group.market-ux-footer-section{padding:0!important;border:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important}
+.footer .market-ux-footer-section h2{margin:0;padding:0 0 12px;font-size:15px;color:#263943;line-height:1.65}
+.footer .market-ux-footer-section .footer-guide-links{max-height:none;overflow:visible;gap:0;padding:0}
+.footer .market-ux-footer-section .footer-guide-links a{display:block;background:transparent!important;border:0;border-radius:0;padding:5px 0!important;min-height:0!important;color:#45545b;font-size:13px!important;line-height:1.85;overflow-wrap:anywhere}
+.footer .market-ux-footer-section .footer-guide-links a:hover{background:transparent!important;color:#9d7b37!important;text-decoration:underline;text-underline-offset:4px}
+.footer .market-ux-footer-section .footer-guide-links svg{display:none!important}
+.footer .footer-guide-top{border-bottom:1px solid #e9e6e1;margin-bottom:26px;padding:15px 0 20px;color:#2b3c44}
+.footer .footer-legal{border-top:1px solid #e9e6e1;margin-top:30px;padding:22px 0;gap:12px 22px;color:#3b4950}
+.footer nav[aria-label="خدمات Google للأعمال"]{background:#f7f3e9!important;border-top:1px solid #e7dbc6!important;border-radius:17px;margin-top:20px;padding:22px!important;gap:10px!important}
+.footer nav[aria-label="خدمات Google للأعمال"] h2{color:#86661e!important;font-size:18px!important}
+.footer nav[aria-label="خدمات Google للأعمال"] p{color:#4d5a5f!important;font-size:13px;line-height:1.8}
+.footer nav[aria-label="خدمات Google للأعمال"] a{color:#304953!important;font-size:13px}
+.footer nav[aria-label="خدمات Google للأعمال"] a:first-child{color:#8e671c!important}
+.br-specialty-rails{display:grid;gap:30px}
+.br-specialty-top{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.br-specialty-top h3{margin:4px 0 0;font-size:clamp(18px,2vw,25px);color:#273a48}
+.br-specialty-top small{font-size:11px;color:#92733e;font-weight:800}
+.br-specialty-actions{display:flex;align-items:center;gap:9px}
+.br-specialty-actions>a{font-size:12px;text-decoration:underline;text-underline-offset:3px;font-weight:750;color:#765c29}
+.br-specialty-actions button{width:34px;height:34px;display:grid;place-items:center;border:1px solid #dcd3c3;background:#fff;border-radius:50%;color:#334450;font-size:18px}
+.br-specialty-track{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#d3c5aa transparent;padding:3px 2px 15px}
+.br-specialty-card{flex:0 0 clamp(190px,24vw,245px);display:flex;flex-direction:column;min-width:0;overflow:hidden;background:#fff;border:1px solid #e4dacc;border-radius:19px;scroll-snap-align:start;box-shadow:0 8px 20px #20344a0c;transition:transform .2s,border-color .2s}
+.br-specialty-card:hover{transform:translateY(-3px);border-color:#bfa46d}
+.br-specialty-image{height:109px;display:block;position:relative;background-image:linear-gradient(to top,#172d3930,#fff9ec12),var(--br-photo);background-size:cover;background-position:center}
+.br-specialty-image i{position:absolute;left:12px;bottom:10px;width:30px;height:30px;display:grid;place-items:center;background:#fffdf5;border-radius:50%;color:#2a4149;font-style:normal}
+.br-specialty-info{padding:13px 15px 16px;display:flex;flex-direction:column;gap:5px;min-height:126px}
+.br-specialty-info small{font-size:10px;line-height:1.6;color:#887456}
+.br-specialty-info strong{font-size:14px;line-height:1.65;color:#253945;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.br-specialty-info em{font-size:11px;font-style:normal;color:#886b38;font-weight:800;margin-top:auto}
+.br-specialty-heading p{max-width:840px}
+.br-guide-steps{background:#f8f4ed;border:1px solid #e7dac9;border-radius:23px;padding:clamp(20px,3vw,32px);margin:29px 0}
+.br-guide-heading small{font-size:12px;color:#93702e;font-weight:800}
+.br-guide-heading h2{font-size:clamp(21px,3vw,29px);margin:5px 0 12px;color:#273a48}
+.br-guide-heading p{font-size:14px;line-height:2;color:#4f5e62}
+.br-guide-step-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:20px}
+.br-guide-step{background:#fff;border:1px solid #e5dbcd;border-radius:16px;padding:18px;min-width:0}
+.br-guide-step>span{font-size:29px;font-weight:900;color:#bb9954}
+.br-guide-step h3{font-size:15px;line-height:1.7;margin:10px 0;color:#2b3e49}
+.br-guide-step p{font-size:12px;color:#5b686b;line-height:1.9;margin:0}
+@media(max-width:1150px){.footer .footer-guide-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:900px){.footer .footer-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:680px){.footer .footer-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}.footer .market-ux-footer-section h2{font-size:13px}.footer .market-ux-footer-section .footer-guide-links a{font-size:12px!important;line-height:1.75}.br-guide-step-grid{grid-template-columns:1fr}.br-specialty-card{flex-basis:min(64vw,220px)}.br-specialty-rails{gap:22px}}
+@media(max-width:350px){.footer . --- TRUNCATED --- 12,031 chars
