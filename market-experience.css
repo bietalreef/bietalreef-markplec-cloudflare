@@ -101,4 +101,16 @@
 @media(max-width:1150px){.footer .footer-guide-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:900px){.footer .footer-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:680px){.footer .footer-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}.footer .market-ux-footer-section h2{font-size:13px}.footer .market-ux-footer-section .footer-guide-links a{font-size:12px!important;line-height:1.75}.br-guide-step-grid{grid-template-columns:1fr}.br-specialty-card{flex-basis:min(64vw,220px)}.br-specialty-rails{gap:22px}}
-@media(max-width:350px){.footer . --- TRUNCATED --- 12,598 chars
+@media(max-width:350px){.footer .market-ux-footer-section .footer-guide-links a{font-size:11.3px!important}.br-specialty-card{flex-basis:200px}}
+@media(prefers-reduced-motion:reduce){.br-specialty-card{transition:none}}
+
+.br-specialty-landing{margin:20px 0 26px!important;padding:22px 25px!important;border:1px solid #e7d7b9!important;border-radius:20px!important;background:#fbf8f0!important}.br-specialty-landing nav{font-size:12px;color:#816b43;margin-bottom:12px}.br-specialty-landing nav a{text-decoration:underline;text-underline-offset:3px}.br-specialty-landing h2{font-size:clamp(20px,3vw,30px);color:#273946;margin:0 0 9px}.br-specialty-landing p{color:#4a5961;font-size:14px;line-height:1.9;margin:0 0 12px}.br-specialty-landing>a{font-size:13px;font-weight:800;color:#8a6b28}
+
+/* BR_RAIL_OVERFLOW_FIX: keep the sliding rows inside the existing responsive container. */
+#content .market-ux-specialties{width:100%;max-width:100%;min-width:0;overflow:hidden}
+#content .br-specialty-rails{display:grid;grid-template-columns:minmax(0,1fr);width:100%;min-width:0;max-width:100%;overflow:hidden}
+#content .br-specialty-section{width:100%;min-width:0;max-width:100%;overflow:hidden}
+#content .br-specialty-top{min-width:0;max-width:100%}
+#content .br-specialty-track{width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;box-sizing:border-box;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+#content .br-specialty-card{flex-shrink:0;max-width:min(78vw,245px)}
+@media(max-width:680px){#content .br-specialty-track{scroll-snap-type:x mandatory}#content .br-specialty-actions{max-width:100%;flex-wrap:wrap}}
