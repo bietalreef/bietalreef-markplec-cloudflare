@@ -100,16 +100,18 @@ function addTaxonomy(){
      field.innerHTML='<label for="filter-specialty">التخصص</label><select id="filter-specialty"><option value="">كل التخصصات</option>'+
        taxonomy.filter(g=>(grouping[cat]||[]).includes(g.key)).flatMap(g=>(g.specialties||[]).map(s=>'<option value="'+esc(s.key)+'"'+(spec===s.key?' selected':'')+'>'+esc(s.name_ar)+'</option>')).join('')+'</select>';
      form.querySelector('#filter-city')?.closest('.field')?.insertAdjacentElement('beforebegin',field);
-     form.addEventListener('submit',e=>{
-      e.preventDefault();e.stopImmediatePropagation();
-      const p=new URLSearchParams(location.hash.split('?')[1]||'');
-      const c=form.querySelector('#filter-category')?.value||'',v=form.querySelector('#filter-specialty')?.value||'';
-      const city=form.querySelector('#filter-city')?.value;
-      c?p.set('category',c):p.delete('category');v&&c?p.set('specialty',v):p.delete('specialty');
-      if(city)sessionStorage.setItem('biet-market-city-choice',city);
-      const next='#results?'+p.toString();
-      if(location.hash===next)window.dispatchEvent(new HashChangeEvent('hashchange'));else location.hash=next;
-     },true);
+     // Preserve the existing form handler: it updates the city and category safely.
+     // Apply the new specialty only after the original handler has finished.
+     form.addEventListener('submit',()=>{
+      const chosen=form.querySelector('#filter-specialty')?.value||'';
+      const chosenCategory=form.querySelector('#filter-category')?.value||'';
+      queueMicrotask(()=>{
+       const p=new URLSearchParams(location.hash.split('?')[1]||'');
+       if(chosen&&chosenCategory)p.set('specialty',chosen);else p.delete('specialty');
+       const next='#results?'+p.toString();
+       if(location.hash!==next)location.hash=next;
+      });
+     });
    }
    if(spec&&!root.querySelector('.market-ux-filter-summary')){
      const item=taxonomy.flatMap(g=>g.specialties||[]).find(x=>x.key===spec);
