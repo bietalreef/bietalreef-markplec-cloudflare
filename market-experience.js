@@ -116,4 +116,107 @@ function addFooterCards(){
  const cards=legal?official.slice(0,4):official;
  box.innerHTML='<div class="market-ux-related-head"><div><span>تابع رحلتك في بيت الريف</span><h2>خطوات وروابط مرتبطة بموضوع '+esc(heading)+'</h2></div><p>مرّر أفقيًا لاكتشاف المزيد، أو انتقل مباشرة إلى ما تحتاجه.</p></div>'+
  '<div class="market-ux-scroll" tabindex="0" aria-label="بطاقات مرتبطة">'+cards.map(([label,href,desc])=>
- '<a class="market-ux-scroll-card" hre --- TRUNCATED --- 18,627 chars
+ '<a class="market-ux-scroll-card" href="'+esc(href)+'"'+(href.startsWith('https:')?' target="_blank" rel="noopener noreferrer"':'')+'><strong>'+esc(label)+'</strong><p>'+esc(desc)+'</p><span aria-hidden="true">←</span></a>').join('')+'</div>'+
+ '<div class="market-ux-bottom-cta"><div><h3>عندك نشاط وتريد الوصول إلى عملاء جدد؟</h3><p>سجّل نشاطك في تطبيق بيت الريف، وأكمل التوثيق واختر قنوات النشر المتاحة حسب اشتراكك.</p></div><a href="'+ctaHref+'" target="_blank" rel="noopener noreferrer">أنشئ متجرك الآن ←</a></div>';
+ page.append(box);
+}
+function addStoreGuidance(){
+ const root=document.querySelector('#content');
+ if(!root||root.querySelector('.market-ux-store-guidance'))return;
+ if(!location.hash.startsWith('#store'))return;
+ const el=document.createElement('section');
+ el.className='market-ux-store-guidance';
+ el.innerHTML='<h2>ماذا تجد داخل متجر الشركة؟</h2><div class="market-ux-tip-grid">'+
+ [['هوية النشاط','التخصص ومناطق الخدمة ووسائل التواصل المنشورة'],
+ ['الأعمال','صور المشاريع التي اعتمد صاحب النشاط نشرها'],
+ ['المنتجات والخدمات','المواصفات ونطاق العمل والأسعار عند توفرها'],
+ ['الطلبات','اطلب عرض سعر عند إتاحة الخدمة من المزود']
+ ].map(([a,b])=>'<article><h3>'+esc(a)+'</h3><p>'+esc(b)+'</p></article>').join('')+
+ '</div><p class="market-ux-note">الصفحة الحالية نموذج عرض. لا تظهر بيانات شركة أو شارة توثيق إلا من سجل منشور ومعتمد.</p>';
+ root.querySelector('.store-header')?.insertAdjacentElement('afterend',el);
+}
+function addTaxonomy(){
+ const root=document.querySelector('#content');if(!root||!taxonomy)return;
+ const onCategory=(location.hash.startsWith('#categories')||location.hash==='#home'||!location.hash);
+ if(onCategory&&!root.querySelector('.market-ux-specialties')){
+  const section=document.createElement('section');
+  section.className='market-ux-specialties section';
+  section.id='market-specialties';
+  section.innerHTML=renderVisualRails();
+  (root.querySelector('.home-categories')||root.querySelector('.category-grid')?.parentElement||root.firstElementChild)?.insertAdjacentElement('afterend',section);
+ }
+ if(location.hash.startsWith('#results')){
+   const params=new URLSearchParams(location.hash.split('?')[1]||'');
+   const cat=params.get('category')||'',spec=params.get('specialty')||'';
+   const form=root.querySelector('#filters-form');
+   if(form&&!form.querySelector('#filter-specialty')){
+     const field=document.createElement('div');field.className='field';
+     field.innerHTML='<label for="filter-specialty">التخصص</label><select id="filter-specialty"><option value="">كل التخصصات</option>'+
+       taxonomy.filter(g=>(grouping[cat]||[]).includes(g.key)).flatMap(g=>(g.specialties||[]).map(s=>'<option value="'+esc(s.key)+'"'+(spec===s.key?' selected':'')+'>'+esc(s.name_ar)+'</option>')).join('')+'</select>';
+     form.querySelector('#filter-city')?.closest('.field')?.insertAdjacentElement('beforebegin',field);
+     // Preserve the existing form handler: it updates the city and category safely.
+     // Apply the new specialty only after the original handler has finished.
+     form.addEventListener('submit',()=>{
+      const chosen=form.querySelector('#filter-specialty')?.value||'';
+      const chosenCategory=form.querySelector('#filter-category')?.value||'';
+      queueMicrotask(()=>{
+       const p=new URLSearchParams(location.hash.split('?')[1]||'');
+       if(chosen&&chosenCategory)p.set('specialty',chosen);else p.delete('specialty');
+       const next='#results?'+p.toString();
+       if(location.hash!==next)location.hash=next;
+      });
+     });
+   }
+   if(spec&&!root.querySelector('.market-ux-filter-summary')){
+     const item=taxonomy.flatMap(g=>g.specialties||[]).find(x=>x.key===spec);
+     const sum=document.createElement('section');sum.className='market-ux-filter-summary br-specialty-landing';
+     const parent=landing.find(c=>c[0]===cat)?.[1]||'أقسام السوق';
+     sum.innerHTML='<nav aria-label="مسار التصفح"><a href="#categories">سوق بيت الريف</a> / <a href="#results?category='+encodeURIComponent(cat)+'">'+esc(parent)+'</a> / '+esc(item?.name_ar||spec)+'</nav><h2>'+esc(item?.name_ar||spec)+'</h2><p>استكشف المنتجات والخدمات والعروض والمتاجر المرتبطة بهذا التخصص، وراجع ما يقدمه كل نشاط بحسب مدينتك. تظهر البطاقات عندما يتوفر محتوى منشور ومعتمد في النظام.</p><a href="#results?category='+encodeURIComponent(cat)+'">← العودة إلى جميع تخصصات '+esc(parent)+'</a>';
+     root.querySelector('.results-layout')?.insertAdjacentElement('beforebegin',sum);
+   }
+   const empty=root.querySelector('.empty');
+   if(empty&&!root.querySelector('.market-ux-empty-link')){
+     const a=document.createElement('a');a.className='market-ux-empty-link';a.href='#info?slug=request-quote';a.textContent='لم تجد ما تبحث عنه؟ تعرّف على تجهيز طلب عرض سعر ←';empty.append(a);
+   }
+ }
+ const nav=document.querySelector('.top-nav');
+ if(nav&&!nav.querySelector('.market-ux-mega')){
+  const menu=document.createElement('details');menu.className='market-ux-mega';
+  menu.innerHTML='<summary>التخصصات <span aria-hidden="true">⌄</span></summary><div class="market-ux-mega-panel">'+landing.map(([id,name])=>'<section><h2>'+esc(name)+'</h2>'+renderSpecialties(id)+'</section>').join('')+'</div>';
+  nav.append(menu);
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.open=false));
+ }
+ const drawer=document.querySelector('#drawer-nav');
+ if(drawer&&!drawer.querySelector('.market-ux-drawer-specialties')){
+  const panel=document.createElement('div');panel.className='market-ux-drawer-specialties';
+  panel.innerHTML='<h3>اختر التخصص</h3>'+landing.map(([id,name])=>'<details><summary>'+esc(name)+'</summary><div>'+renderSpecialties(id)+'</div></details>').join('');
+  drawer.append(panel);
+ }
+}
+function enhance(){
+ if(running)return;running=true;
+ try{footerColumns();addFooterCards();enrichFooterPage();addStoreGuidance();addTaxonomy();}
+ finally{running=false;}
+}
+async function loadTaxonomy(){
+ try{
+  const x=await fetch('/api/public-market-taxonomy',{credentials:'omit',signal:AbortSignal.timeout(8000)});
+  if(!x.ok)throw Error('taxonomy-unavailable');
+  const j=await x.json();
+  if(!j.ok||!Array.isArray(j.groups))throw Error('taxonomy-invalid');
+  taxonomy=j.groups.filter(g=>g&&typeof g.key==='string'&&Array.isArray(g.specialties));
+  enhance();
+ }catch{
+  const nav=document.querySelector('.top-nav');
+  if(nav&&!nav.querySelector('.market-ux-taxonomy-status')){
+   const span=document.createElement('span');span.className='market-ux-taxonomy-status';
+   span.textContent='التخصصات الفرعية غير متاحة مؤقتًا';nav.append(span);
+  }
+ }
+}
+const root=document.querySelector('#content');
+if(root)new MutationObserver(()=>{if(updated)return;updated=true;requestAnimationFrame(()=>{updated=false;enhance();});}).observe(root,{childList:true});
+window.addEventListener('hashchange',()=>requestAnimationFrame(enhance));
+document.addEventListener('DOMContentLoaded',enhance,{once:true});
+enhance();
+void loadTaxonomy();
