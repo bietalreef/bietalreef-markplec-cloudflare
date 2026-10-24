@@ -101,4 +101,4 @@
 @media(max-width:1150px){.footer .footer-guide-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:900px){.footer .footer-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:680px){.footer .footer-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}.footer .market-ux-footer-section h2{font-size:13px}.footer .market-ux-footer-section .footer-guide-links a{font-size:12px!important;line-height:1.75}.br-guide-step-grid{grid-template-columns:1fr}.br-specialty-card{flex-basis:min(64vw,220px)}.br-specialty-rails{gap:22px}}
-@media(max-width:350px){.footer . --- TRUNCATED --- 12,031 chars
+@media(max-width:350px){.footer . --- TRUNCATED --- 12,598 chars
