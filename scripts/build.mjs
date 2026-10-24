@@ -2,7 +2,7 @@ import {mkdir,copyFile,writeFile,rm} from 'node:fs/promises';
 import {data,pageRecords,documentPage} from '../content/guides.mjs';
 await rm('dist',{recursive:true,force:true});
 await mkdir('dist',{recursive:true});
-for(const name of ['index.html','styles.css','app.js','routes.js','content.css'])await copyFile(name,`dist/${name}`);
+for(const name of ['index.html','styles.css','app.js','routes.js','content.css','market-experience.js','market-experience.css'])await copyFile(name,`dist/${name}`);
 await writeFile('dist/robots.txt','User-agent: *\nDisallow: /\n');
 await writeFile('dist/_headers',`/*
   X-Robots-Tag: noindex, nofollow, noarchive
