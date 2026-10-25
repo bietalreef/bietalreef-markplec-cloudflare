@@ -12,9 +12,10 @@
     "productionConnected": false,
     "deploymentMethod": "staging/direct-upload; production served by separately managed Cloudflare Worker",
     "automaticGitDeployment": false,
-    "productionWorker": "bietalreef-market-test",
+    "productionWorker": "bietalreef-marketplace",
     "productionWorkerGitBuildTriggers": 0,
-    "productionNote": "Marketplace repo is a UX prototype; do not deploy it over production until production parity, commerce, auth, and rollback are verified."
+    "productionNote": "Production app.bietalreef.ae and www.app.bietalreef.ae route to Cloudflare Worker bietalreef-marketplace. This repository is still prototype-only, with zero Cloudflare Worker Git build triggers; do not publish it to production before feature parity, commerce/auth tests, and rollback readiness.",
+    "productionWorkerVerifiedOn": "2026-10-26"
   },
   "platform": {
     "repository": "bietalreef/bietalreef-platform-cloudflare",
