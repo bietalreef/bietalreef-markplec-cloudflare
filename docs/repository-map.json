@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-15",
+  "verifiedAt": "2026-10-26",
   "marketplace": {
     "displayName": "سوق بيت الريف المفتوح",
     "packageName": "bietalreef-marketplace",
@@ -10,8 +10,11 @@
     "developmentHost": "bietalreef-market-staging.pages.dev",
     "productionTarget": "app.bietalreef.ae",
     "productionConnected": false,
-    "deploymentMethod": "direct-upload",
-    "automaticGitDeployment": false
+    "deploymentMethod": "staging/direct-upload; production served by separately managed Cloudflare Worker",
+    "automaticGitDeployment": false,
+    "productionWorker": "bietalreef-market-test",
+    "productionWorkerGitBuildTriggers": 0,
+    "productionNote": "Marketplace repo is a UX prototype; do not deploy it over production until production parity, commerce, auth, and rollback are verified."
   },
   "platform": {
     "repository": "bietalreef/bietalreef-platform-cloudflare",
@@ -24,7 +27,9 @@
     "visibility": "private",
     "branch": "main",
     "project": "bietalreef-admin-staging",
-    "host": "admin.bietalreef.ae"
+    "host": "admin.bietalreef.ae",
+    "cloudflarePagesGitSourceConnected": false,
+    "deployMethod": "GitHub Actions direct Cloudflare Pages upload (workflow configured in admin repository)"
   },
   "providerApp": {
     "repository": "bietalreef/bietalreef-weyaak-flutter",
@@ -35,7 +40,13 @@
   "legacyMarketplace": {
     "repository": "bietalreef/Figmawebapp",
     "cloudflareProject": "appbietalreef",
-    "role": "existing production retained until migration validation"
+    "role": "Legacy Pages project retained but Git source disconnected; not source of active marketplace domains.",
+    "gitSourceConnected": false,
+    "gitSourceDisconnectedOn": "2026-10-26",
+    "legacyPagesHost": "figmawebapp.pages.dev",
+    "customDomains": [],
+    "projectDeleted": false,
+    "note": "Cloudflare Pages /source API returned success and source=null. Revoking repository access from Cloudflare's GitHub App is a separate GitHub installation-permissions action."
   },
-  "namingNote": "markplec is the exact repository name requested by the owner. Marketplace is the normalized package/UI term. No repository was renamed and no legacy production source was re-pointed."
+  "namingNote": "markplec is the exact existing marketplace GitHub repository name. Production worker and repository are not yet wired into a verified Git-driven release; do not infer production from repository presence."
 }
