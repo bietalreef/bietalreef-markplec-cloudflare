@@ -41,13 +41,15 @@
   "legacyMarketplace": {
     "repository": "bietalreef/Figmawebapp",
     "cloudflareProject": "appbietalreef",
-    "role": "Legacy Pages project retained but Git source disconnected; not source of active marketplace domains.",
+    "role": "Deleted Cloudflare Pages project; no active Git source or Pages deployments remain for this project.",
     "gitSourceConnected": false,
     "gitSourceDisconnectedOn": "2026-10-26",
     "legacyPagesHost": "figmawebapp.pages.dev",
     "customDomains": [],
-    "projectDeleted": false,
-    "note": "Cloudflare Pages /source API returned success and source=null. Revoking repository access from Cloudflare's GitHub App is a separate GitHub installation-permissions action."
+    "projectDeleted": true,
+    "note": "Cloudflare API DELETE appbietalreef returned HTTP 200; subsequent project listing excluded appbietalreef and direct GET returned HTTP 404 (Project not found). Original GitHub repository is not deleted.",
+    "projectDeletedOn": "2026-10-26",
+    "cloudflareProjectExists": false
   },
   "namingNote": "markplec is the exact existing marketplace GitHub repository name. Production worker and repository are not yet wired into a verified Git-driven release; do not infer production from repository presence."
 }
