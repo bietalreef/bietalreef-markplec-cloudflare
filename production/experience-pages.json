@@ -1,0 +1,532 @@
+{
+  "studio": {
+    "slug": "design",
+    "image": "/media/experiences/biet-al-reef-design-vision-v1.webp",
+    "ar": {
+      "title": "مستقبل التصميم",
+      "eyebrow": "استوديو التصميم التفاعلي",
+      "summary": "ابدأ بفكرة، واكتشف كيف يمكن للأثاث والألوان والخامات أن تمنح مساحتك طابعها الخاص.",
+      "intro": "في استوديو بيت الريف يمكنك تحريك قطع الأثاث داخل غرفة ثلاثية الأبعاد، وتجربة خيارات الألوان والخامات، ثم حفظ صورة لتصميمك على جهازك.",
+      "note": "للحصول على مقاسات ومخططات تنفيذية، استعن بالمتخصص المناسب لمشروعك.",
+      "imageAlt": "تصور لعميل ومهندس يستكشفان تصميم غرفة رقمية في موقع بناء",
+      "featuresTitle": "مساحتك تبدأ من هنا",
+      "features": [
+        {
+          "title": "رتّب بطريقتك",
+          "body": "حرّك المجسمات وغيّر زاوية المشهد لتستكشف توزيعًا يناسب فكرتك."
+        },
+        {
+          "title": "جرّب الألوان والخامات",
+          "body": "قارن بين خيارات الجدران والأرضيات والأقمشة في مساحة واحدة."
+        },
+        {
+          "title": "احتفظ بفكرتك",
+          "body": "احفظ صورة للمشهد على جهازك لتعود إلى الفكرة أو تشاركها."
+        }
+      ],
+      "primary": {
+        "label": "افتح استوديو التصميم",
+        "href": "/studio"
+      },
+      "secondary": {
+        "label": "استكشف الأثاث والمعيشة",
+        "href": "/categories/furniture"
+      },
+      "visionTitle": "رؤية تبدأ من الموقع",
+      "visionText": "نتطلع إلى رحلة تبدأ بقياس المكان داخل مسار إنشاء المشروع في تطبيق بيت الريف، ثم إعداد المخطط واستكشاف التصميم والمنتجات والخبرات المناسبة. يمكنك اليوم تجربة تنسيق مساحتك في استوديو التصميم.",
+      "galleryTitle": "من المساحة إلى الفكرة",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-project-measurement-vision-v1.webp",
+          "alt": "تصور للقياس الميداني وتحويل المساحة إلى مخطط رقمي",
+          "title": "المكان والمخطط",
+          "body": "رؤية مستقبلية تربط قياس المساحة بالمخطط والتصميم لتوضيح الفكرة قبل التنفيذ."
+        },
+        {
+          "src": "/media/studio/studio-render-v4k.webp",
+          "alt": "مشهد من استوديو التصميم ثلاثي الأبعاد في بيت الريف",
+          "title": "جرّب الاستوديو اليوم",
+          "body": "حرّك المجسمات وجرّب توزيع الأثاث والألوان داخل المشهد المتاح حاليًا."
+        }
+      ]
+    },
+    "en": {
+      "title": "The Future of Design",
+      "eyebrow": "Interactive Design Studio",
+      "summary": "Start with an idea and explore how furniture, colours and materials can give your space its own character.",
+      "intro": "In the Biet Al Reef studio, move furniture in a 3D room, try colours and finishes, and save an image of your design to your device.",
+      "note": "For construction measurements and drawings, consult a qualified professional.",
+      "imageAlt": "Concept of a client and designer exploring a digital room in a construction space",
+      "featuresTitle": "Make the space your own",
+      "features": [
+        {
+          "title": "Arrange your way",
+          "body": "Move the models and change your viewpoint to explore a layout."
+        },
+        {
+          "title": "Explore colours and finishes",
+          "body": "Compare walls, floors and fabrics together in one space."
+        },
+        {
+          "title": "Keep your idea",
+          "body": "Save an image of the scene to your device to revisit or share."
+        }
+      ],
+      "primary": {
+        "label": "Open the design studio",
+        "href": "/studio"
+      },
+      "secondary": {
+        "label": "Explore furniture and living",
+        "href": "/categories/furniture"
+      },
+      "visionTitle": "A vision that starts on site",
+      "visionText": "We envision a journey that starts with measurements in the project creation flow of the Biet Al Reef app, followed by planning, design and discovery. Today you can arrange your space in the design studio.",
+      "galleryTitle": "From space to idea",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-project-measurement-vision-v1.webp",
+          "alt": "Concept for site measurement and a digital floor plan",
+          "title": "The space and the plan",
+          "body": "A future concept connecting measurements, plans and design before execution."
+        },
+        {
+          "src": "/media/studio/studio-render-v4k.webp",
+          "alt": "A scene from the Biet Al Reef 3D design studio",
+          "title": "Try the studio today",
+          "body": "Move models and explore furniture placement and colours in the available scene."
+        }
+      ]
+    },
+    "heroSlides": [
+      {
+        "image": "/media/experiences/biet-al-reef-interactive-living-room-v1.webp",
+        "altAr": "غرفة معيشة مع نقاط لاكتشاف الأثاث والإضاءة",
+        "altEn": "Living room with interactive furniture and lighting points",
+        "points": [
+          {
+            "x": 39,
+            "y": 58,
+            "href": "/categories/furniture",
+            "ar": {
+              "label": "الأريكة",
+              "title": "أريكة تناسب مساحتك",
+              "body": "اكتشف أفكار الأثاث والخامات التي تمنح غرفة المعيشة طابعها.",
+              "action": "اكتشف الأثاث"
+            },
+            "en": {
+              "label": "Sofa",
+              "title": "A sofa for your space",
+              "body": "Explore furniture ideas and finishes for your living room.",
+              "action": "Explore furniture"
+            }
+          },
+          {
+            "x": 51,
+            "y": 28,
+            "href": "/categories/decor",
+            "ar": {
+              "label": "الإضاءة",
+              "title": "إضاءة تصنع الأجواء",
+              "body": "استكشف أفكار الإنارة والديكور لكل زاوية.",
+              "action": "اكتشف الديكور"
+            },
+            "en": {
+              "label": "Lighting",
+              "title": "Lighting sets the mood",
+              "body": "Explore lighting and decor ideas for every corner.",
+              "action": "Explore decor"
+            }
+          },
+          {
+            "x": 60,
+            "y": 68,
+            "href": "/categories/furniture",
+            "ar": {
+              "label": "طاولة القهوة",
+              "title": "تفاصيل تجمع المكان",
+              "body": "تعرف على أفكار الطاولات والتنسيق مع الأثاث.",
+              "action": "اكتشف الأثاث"
+            },
+            "en": {
+              "label": "Coffee table",
+              "title": "Details that bring a room together",
+              "body": "Explore tables and ideas for coordinating your furniture.",
+              "action": "Explore furniture"
+            }
+          }
+        ]
+      },
+      {
+        "image": "/media/experiences/biet-al-reef-living-room-inspiration-v1.webp",
+        "altAr": "غرفة عصرية لاكتشاف تنسيق الأثاث والخامات",
+        "altEn": "Contemporary living room for exploring furniture and finishes",
+        "points": [
+          {
+            "x": 26,
+            "y": 56,
+            "href": "/categories/furniture",
+            "ar": {
+              "label": "الأريكة",
+              "title": "راحة بتفاصيل جميلة",
+              "body": "استكشف أشكال الأرائك وخاماتها لتختار ما يناسبك.",
+              "action": "استكشف الأثاث"
+            },
+            "en": {
+              "label": "Sofa",
+              "title": "Comfort in every detail",
+              "body": "Explore sofa styles and finishes for your space.",
+              "action": "Explore furniture"
+            }
+          },
+          {
+            "x": 48,
+            "y": 76,
+            "href": "/categories/furniture",
+            "ar": {
+              "label": "الطاولة",
+              "title": "طاولة تكمل الجلسة",
+              "body": "اختر أفكارًا تنسجم مع مساحة الجلوس.",
+              "action": "استكشف الطاولات"
+            },
+            "en": {
+              "label": "Table",
+              "title": "A table that completes the room",
+              "body": "Discover ideas that complement your seating area.",
+              "action": "Explore tables"
+            }
+          },
+          {
+            "x": 60,
+            "y": 42,
+            "href": "/categories/decor",
+            "ar": {
+              "label": "النبات والديكور",
+              "title": "لمسة من الطبيعة",
+              "body": "اكتشف أفكار الديكور التي تضيف حياة للمكان.",
+              "action": "استكشف الديكور"
+            },
+            "en": {
+              "label": "Plants and decor",
+              "title": "A touch of nature",
+              "body": "Discover decor ideas that bring a space to life.",
+              "action": "Explore decor"
+            }
+          }
+        ]
+      }
+    ],
+    "video": {
+      "src": "/media/experiences/biet-al-reef-design-vision-v1.mp4",
+      "poster": "/media/experiences/biet-al-reef-design-vision-v1.webp",
+      "ar": {
+        "title": "شاهد رؤية بيت الريف",
+        "description": "من الموقع إلى فكرة تنبض بالحياة، اكتشف الرحلة التي نطمح إلى بنائها معًا."
+      },
+      "en": {
+        "title": "See the Biet Al Reef vision",
+        "description": "From a space on site to an idea brought to life, discover the journey we envision together."
+      }
+    }
+  },
+  "showroom": {
+    "slug": "stores",
+    "image": "/media/experiences/biet-al-reef-interactive-showroom-v1.webp",
+    "ar": {
+      "title": "مستقبل المتاجر",
+      "eyebrow": "المتاجر والمعارض",
+      "summary": "اكتشف عالمًا يجمع أفكار المنزل بالمتاجر والمنتجات المناسبة لاحتياجاتك.",
+      "intro": "تصفح أقسام السوق واكتشف ما تنشره المتاجر والشركات من منتجات وخدمات. ونعمل على تطوير رؤية تربط إلهام التصميم بطريقة عرض المنتجات في المستقبل.",
+      "note": "قارن المقاسات والخامات وتفاصيل المنتج لاختيار ما يناسب مساحتك.",
+      "imageAlt": "تصور لعميل ومستشار في معرض أثاث مع تصور للمنتج في غرفة",
+      "featuresTitle": "اكتشف ما يلائم مساحتك",
+      "features": [
+        {
+          "title": "تصفح الأقسام",
+          "body": "ابدأ بالأثاث أو الديكور أو المطابخ، وانتقل إلى ما تبحث عنه."
+        },
+        {
+          "title": "اكتشف المتاجر",
+          "body": "تعرّف على المتاجر والشركات عند توفر صفحاتها المنشورة في السوق."
+        },
+        {
+          "title": "استلهم التصميم",
+          "body": "جرّب أفكار ترتيب المساحات في الاستوديو قبل اختيار احتياجاتك."
+        }
+      ],
+      "primary": {
+        "label": "تصفح المتاجر",
+        "href": "/search?type=store"
+      },
+      "secondary": {
+        "label": "استكشف أقسام السوق",
+        "href": "/categories"
+      },
+      "visionTitle": "المعرض داخل رحلة التصميم",
+      "visionText": "رؤيتنا أن يكتشف العميل منتجات المعارض في سياق المساحة التي يصممها، وأن يجد معلومات واضحة تساعده على الاختيار. عرض منتجات التجار داخل التصاميم مسار مستقبلي، وتبقى المنتجات والمتاجر المتاحة مرتبطة بالنشر الفعلي.",
+      "galleryTitle": "من المعرض إلى المساحة",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-furniture-showroom-v1.webp",
+          "alt": "تصور إلهامي لمعرض أثاث وديكور",
+          "title": "اكتشف أسلوبك",
+          "body": "ابدأ بما يناسب احتياجك، وقارن الخامات والمقاسات والمواصفات قبل الاختيار."
+        },
+        {
+          "src": "/media/experiences/biet-al-reef-living-room-inspiration-v1.webp",
+          "alt": "تصور إلهامي لغرفة معيشة عصرية",
+          "title": "تخيل القطعة في بيتك",
+          "body": "الربط بين منتجات التجار ومشهد التصميم من الأفكار التي نطمح لتطويرها."
+        }
+      ]
+    },
+    "en": {
+      "title": "The Future of Stores",
+      "eyebrow": "Stores and Showrooms",
+      "summary": "Discover a world that brings home ideas together with stores and products for your needs.",
+      "intro": "Browse marketplace categories and discover products and services published by businesses. We are developing a vision for connecting design inspiration with product displays in the future.",
+      "note": "Compare dimensions, materials and product details to choose what suits your space.",
+      "imageAlt": "Concept of a customer and consultant in a showroom imagining furniture in a room",
+      "featuresTitle": "Find inspiration for your space",
+      "features": [
+        {
+          "title": "Explore categories",
+          "body": "Start with furniture, decor or kitchens and find what matters to you."
+        },
+        {
+          "title": "Discover stores",
+          "body": "Explore businesses when their approved pages are published in the marketplace."
+        },
+        {
+          "title": "Imagine your space",
+          "body": "Try layout ideas in the studio as you plan what you need."
+        }
+      ],
+      "primary": {
+        "label": "Browse stores",
+        "href": "/search?type=store"
+      },
+      "secondary": {
+        "label": "Explore categories",
+        "href": "/categories"
+      },
+      "visionTitle": "The showroom in the design journey",
+      "visionText": "Our vision is to help customers discover showroom products in the context of the space they are designing, with clear information to support their choices. Placing merchant products in designs is a future direction; actual availability depends on published listings.",
+      "galleryTitle": "From showroom to space",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-furniture-showroom-v1.webp",
+          "alt": "Inspirational furniture and decor showroom",
+          "title": "Discover your style",
+          "body": "Start with your needs and compare materials, dimensions and specifications."
+        },
+        {
+          "src": "/media/experiences/biet-al-reef-living-room-inspiration-v1.webp",
+          "alt": "Inspirational contemporary living room",
+          "title": "Imagine the piece at home",
+          "body": "Connecting merchant products to design scenes is an idea we hope to develop."
+        }
+      ]
+    }
+  },
+  "projects": {
+    "slug": "contracting-services",
+    "image": "/media/experiences/biet-al-reef-contracting-services-v1.webp",
+    "ar": {
+      "title": "مستقبل المقاولات والخدمات",
+      "eyebrow": "من الفكرة إلى التنفيذ",
+      "summary": "كل مشروع يبدأ بفكرة واضحة واحتياجات محددة، ثم بالبحث عن الخبرة والخدمات المناسبة.",
+      "intro": "استكشف أقسام البناء والتشطيبات والصيانة، وجهّز وصف مشروعك ومقاساته وصوره لتسهيل التواصل مع مقدمي الخدمات عند توفرهم.",
+      "note": "راجع نطاق العمل والمقاسات والخامات مع مقدم الخدمة قبل الاتفاق.",
+      "imageAlt": "تصور لعميل ومهندسين يراجعون مخطط مشروع سكني",
+      "featuresTitle": "خطوات أقرب إلى إنجاز مشروعك",
+      "features": [
+        {
+          "title": "حدّد احتياجك",
+          "body": "اكتب نطاق العمل والموقع والمقاسات وأرفق الصور إن توفرت."
+        },
+        {
+          "title": "اكتشف الأعمال والتخصصات",
+          "body": "راجع التخصص والخبرة ونماذج الأعمال المتاحة لكل مقدم خدمة منشور."
+        },
+        {
+          "title": "جهّز طلبك",
+          "body": "راجع دليل طلب عرض السعر والتفاصيل التي تساعد على توضيح المشروع."
+        }
+      ],
+      "primary": {
+        "label": "استكشف الخدمات",
+        "href": "/search?type=service"
+      },
+      "secondary": {
+        "label": "دليل طلب عرض السعر",
+        "href": "/guides/request-quote"
+      },
+      "visionTitle": "أعمال المقاول بصورة أوضح",
+      "visionText": "نتصور مساحة مهنية يستطيع فيها المقاول عرض أعماله ومخططاته ومعداته ومستنداته، وربط تفاصيل المشروع بمراحل العمل. الصور تعرض هذه الرؤية المستقبلية، فيما يعتمد ما يمكن تصفحه اليوم على المحتوى المعتمد والمنشور.",
+      "galleryTitle": "تفاصيل تدعم قرارك",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-construction-plans-materials-v1.webp",
+          "alt": "تصور لمخططات وعينات مواد لمشروع داخلي",
+          "title": "المخطط والخامات",
+          "body": "راجع نطاق العمل والمقاسات والخامات المطلوبة قبل مقارنة الخيارات."
+        },
+        {
+          "src": "/media/experiences/biet-al-reef-project-measurement-vision-v1.webp",
+          "alt": "تصور مستقبلي لقياس الموقع وربطه بمخطط رقمي",
+          "title": "من الموقع إلى التصور",
+          "body": "نتطلع إلى ربط القياس بالمخططات ضمن مسار إنشاء المشروع في التطبيق."
+        }
+      ]
+    },
+    "en": {
+      "title": "The Future of Contracting and Services",
+      "eyebrow": "From Idea to Delivery",
+      "summary": "Every project starts with a clear idea and a search for the right expertise and services.",
+      "intro": "Explore construction, finishing and maintenance categories, and prepare your project description, measurements and photos for discussions with available providers.",
+      "note": "Review the scope, dimensions and materials with your service provider before agreeing.",
+      "imageAlt": "Concept of a client and engineers reviewing a residential project plan",
+      "featuresTitle": "A clearer path for your project",
+      "features": [
+        {
+          "title": "Define your needs",
+          "body": "Describe the work, location and measurements, and add photos if available."
+        },
+        {
+          "title": "Explore work and specialties",
+          "body": "Review the expertise and available portfolio of each published service provider."
+        },
+        {
+          "title": "Prepare your request",
+          "body": "Read the quote request guide and gather the details that explain your project."
+        }
+      ],
+      "primary": {
+        "label": "Explore services",
+        "href": "/search?type=service"
+      },
+      "secondary": {
+        "label": "Quote request guide",
+        "href": "/guides/request-quote"
+      },
+      "visionTitle": "A clearer showcase for contractors",
+      "visionText": "We envision a professional space for contractors to present their work, plans, equipment and documents, connecting project details to stages of work. These images illustrate that future; what can be browsed today depends on approved published content.",
+      "galleryTitle": "Details that support a decision",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-construction-plans-materials-v1.webp",
+          "alt": "Concept plans and material samples for an interior project",
+          "title": "Plans and materials",
+          "body": "Review the scope, measurements and materials before comparing options."
+        },
+        {
+          "src": "/media/experiences/biet-al-reef-project-measurement-vision-v1.webp",
+          "alt": "Future concept for measuring a site and linking it to a digital plan",
+          "title": "From site to concept",
+          "body": "We envision measurements linked to plans within the app’s project creation flow."
+        }
+      ]
+    }
+  },
+  "partner": {
+    "slug": "partnerships",
+    "image": "/media/experiences/biet-al-reef-business-partnerships-v1.webp",
+    "ar": {
+      "title": "مستقبل الشراكة مع بيت الريف",
+      "eyebrow": "فرص لأصحاب الأعمال",
+      "summary": "مساحة لأصحاب المتاجر والموردين وشركات المقاولات ومقدمي الخدمات لبناء حضورهم في بيت الريف.",
+      "intro": "ابدأ من تطبيق الأعمال الرسمي لإنشاء ملف نشاطك وإدارة بياناتك والمنتجات والخدمات التي تريد تقديمها. يخضع النشر للصلاحيات والمراجعة المعتمدة.",
+      "note": "تختلف الخيارات المتاحة بحسب باقة النشاط واحتياجاته.",
+      "imageAlt": "تصور لتعاون متجر ومقاول ومورد حول عينات مواد",
+      "featuresTitle": "خطوات حضور نشاطك",
+      "features": [
+        {
+          "title": "أنشئ ملف النشاط",
+          "body": "عرّف العملاء بنشاطك وتخصصاتك وبيانات التواصل عبر تطبيق الأعمال."
+        },
+        {
+          "title": "أضف ما تقدمه",
+          "body": "جهّز صور ومعلومات منتجاتك أو خدماتك بصورة واضحة ودقيقة."
+        },
+        {
+          "title": "تابع النشر",
+          "body": "راجع شروط النشر وصلاحيات حسابك وأكمل ما يلزم لاعتماد المحتوى."
+        }
+      ],
+      "primary": {
+        "label": "دليل الانضمام",
+        "href": "/business/join"
+      },
+      "secondary": {
+        "label": "افتح تطبيق الأعمال",
+        "href": "https://providers.bietalreef.ae"
+      },
+      "visionTitle": "منظومة تجمع الخبرات",
+      "visionText": "تجمع الرؤية بين المعرض والمورد والمقاول وتطبيق الأعمال في رحلة واحدة، بحيث يستطيع كل طرف تقديم خبرته بصورة أوضح. بناء هذه التجربة وتوفر ميزاتها يعتمدان على التطوير والاعتماد الفعلي لكل نشاط.",
+      "galleryTitle": "أدوار تصنع تجربة متكاملة",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-furniture-showroom-v1.webp",
+          "alt": "تصور إلهامي لمعرض أثاث ومواد",
+          "title": "المتجر والمورد",
+          "body": "اعرض المنتجات والخامات بمعلومات وصور دقيقة تساعد العملاء على فهم ما تقدمه."
+        },
+        {
+          "src": "/media/experiences/biet-al-reef-business-materials-v1.webp",
+          "alt": "تصور لطاولة تعاون تضم عينات مواد ومخططات",
+          "title": "المقاول وشركاء العمل",
+          "body": "عرّف العملاء بتخصصك وجهّز تفاصيل الخدمات والأعمال التي تريد تقديمها."
+        }
+      ]
+    },
+    "en": {
+      "title": "The Future of Partnership",
+      "eyebrow": "For Businesses",
+      "summary": "A place for stores, suppliers, contractors and service providers to build their presence with Biet Al Reef.",
+      "intro": "Use the official business application to create a business profile and manage the details, products and services you wish to offer. Publication is subject to permissions and review.",
+      "note": "Available options depend on the business plan and needs.",
+      "imageAlt": "Concept of a store owner, contractor and supplier collaborating over material samples",
+      "featuresTitle": "Build your business presence",
+      "features": [
+        {
+          "title": "Create a business profile",
+          "body": "Introduce your business, specialties and contact information in the business application."
+        },
+        {
+          "title": "Add your offerings",
+          "body": "Prepare clear, accurate images and details for your products or services."
+        },
+        {
+          "title": "Follow publication",
+          "body": "Review publishing requirements and your account permissions, and complete the approval steps."
+        }
+      ],
+      "primary": {
+        "label": "Joining guide",
+        "href": "/business/join"
+      },
+      "secondary": {
+        "label": "Open business application",
+        "href": "https://providers.bietalreef.ae"
+      },
+      "visionTitle": "An ecosystem of expertise",
+      "visionText": "The vision connects showrooms, suppliers, contractors and the business application in one journey, giving each participant a clearer way to present their expertise. The experience and its features depend on development and individual approval.",
+      "galleryTitle": "Roles in a connected journey",
+      "gallery": [
+        {
+          "src": "/media/experiences/biet-al-reef-furniture-showroom-v1.webp",
+          "alt": "Inspirational furniture and materials showroom",
+          "title": "Stores and suppliers",
+          "body": "Present products and materials with accurate information and helpful imagery."
+        },
+        {
+          "src": "/media/experiences/biet-al-reef-business-materials-v1.webp",
+          "alt": "Concept collaboration table with material samples and plans",
+          "title": "Contractors and business partners",
+          "body": "Introduce your specialties and prepare details of the work and services you offer."
+        }
+      ]
+    }
+  }
+}
