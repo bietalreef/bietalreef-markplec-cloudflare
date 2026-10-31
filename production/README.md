@@ -1,0 +1,9 @@
+# Marketplace production worker
+
+The single production Worker for `app.bietalreef.ae` is `bietalreef-marketplace`. The root project's historical prototype is retained for reference; it is not the production deploy source. Production changes are built from this directory.
+
+`worker-baseline.mjs` is the complete previously deployed Cloudflare version `2347cc55-3451-412a-bbef-5e689e71e985`, recovered from the version API with SHA-256 `0993849f810b587f7db575c290c5de057ce56dd707d4b3bba2b6bd82031dc4c3`. It includes the original 3D studio, static resources, public taxonomy proxy, security headers and Google Workspace page. `assets/` contains only the source files modified by this release, plus `footer-pages.js` for verification; `build.py` replaces those assets, creates HTML routes and sitemap, and emits `dist/worker.mjs`. It does not contain service-role credentials.
+
+From the repository root, run `npm run build` and `npm test`. Build output is generated and ignored by Git. Deployment must use the tested output and the original Worker; it must not deploy the historical prototype. Production rollback before this release is available through Cloudflare version `2347cc55-3451-412a-bbef-5e689e71e985`.
+
+This release converts public navigation to real paths, provides English counterparts, preserves fragment compatibility client-side, and exposes indexable HTML for the supported informational paths. `/search`, `/cart`, `/listing`, and `/store` are non-indexable browsing or placeholder states; no sample businesses are published. Merchant publishing from database records and automated cache invalidation are not implemented by this routing release and need their own integration and acceptance tests.

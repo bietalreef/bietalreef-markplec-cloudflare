@@ -1,3 +1,9 @@
+# Production source
+
+The active Cloudflare Worker source, build, tests and release guidance are in [`production/`](production/README.md). The text below describes the historical prototype and is retained for context only.
+
+---
+
 # سوق بيت الريف — نموذج تجربة جديد
 
 Fresh development-only marketplace prototype, authored from scratch. No files, components, images, account records or product data were copied from the old marketplace or admin repositories.
