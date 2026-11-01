@@ -7,13 +7,16 @@ if(liveHost&&['/api/public-market-products','/api/public-market-stores'].include
   return new Response(request.method==='HEAD'?null:JSON.stringify(data),{headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public,max-age=15','X-Content-Type-Options':'nosniff'}});
  }catch{return new Response(JSON.stringify({ok:false}),{status:503,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}})}
 }
-if(liveHost && /^\/(?:en\/)?(?:stores|product)\/[A-Za-z0-9][A-Za-z0-9_-]{0,159}\/?$/.test(url.pathname)){
- const en=url.pathname.startsWith('/en/'),raw=url.pathname.replace(/^\/en/,'').replace(/\/$/,''),match=raw.match(/^\/(stores|product)\/([A-Za-z0-9][A-Za-z0-9_-]{0,159})$/),kind=match[1]==='stores'?'store':'product';
+if(liveHost && /^\/(?:en\/)?(?:(?:stores|product)\/[A-Za-z0-9][A-Za-z0-9_-]{0,159}|products\/[a-z0-9][a-z0-9-]{0,119}\/[a-z0-9][a-z0-9-]{0,159})\/?$/.test(url.pathname)){
+ const en=url.pathname.startsWith('/en/'),raw=url.pathname.replace(/^\/en/,'').replace(/\/$/,''),parts=raw.split('/').filter(Boolean),kind=parts[0]==='stores'?'store':'product';
  if(url.pathname.endsWith('/'))return Response.redirect('https://app.bietalreef.ae'+url.pathname.replace(/\/+$/,'')+url.search,301);
- const loaded=await BR_LOAD_MARKET_PAGE(kind,match[2]);
+ const loaded=await BR_LOAD_MARKET_PAGE(parts[0]==='products'?'named-product':kind,parts[1],parts[2]);
  if(loaded.error)return new Response('Temporarily unavailable',{status:503,headers:{...H,'Cache-Control':'no-store','Retry-After':'30'}});
  if(loaded.missing)return new Response('Not found',{status:404,headers:{...H,'Cache-Control':'no-store'}});
- if(kind==='product'){const stable=BR_MARKET_SEGMENT(loaded.data.product.route_key);if(stable&&stable!==match[2])return Response.redirect('https://app.bietalreef.ae'+(en?'/en':'')+'/product/'+encodeURIComponent(stable)+url.search,301);}
+ if(parts[0]==='product'){
+  const target=BR_MARKET_PRODUCT_PATH(loaded.data.store_profile?.slug,loaded.data.product?.slug,loaded.data.product?.route_key,en);
+  if(target&&target!==(en?'/en':'')+raw)return Response.redirect('https://app.bietalreef.ae'+target+url.search,301);
+ }
  const item=kind==='store'?loaded.data.profile:loaded.data.product;
  const title=kind==='store'?BR_MARKET_TEXT(en?item.nameEn:item.nameAr,en,en?'Store':'متجر'):BR_MARKET_TEXT(en?item.name_en:item.name_ar,en,en?'Product':'منتج');
  const desc=kind==='store'?BR_MARKET_TEXT(en?item.descriptionEn:item.descriptionAr,en,''):BR_MARKET_TEXT(en?item.description_en:item.description_ar,en,'');

@@ -10,9 +10,9 @@ const fixture=JSON.parse(fs.readFileSync(new URL('../experience-pages.json',impo
 let published=structuredClone(fixture);
 let marketSitemap=[],marketSitemapDown=false;
 const realFetch=globalThis.fetch;
-let storeData={ok:true,studio_allowed:true,profile:{slug:'test-workshop',nameAr:'متجر الاختبار',nameEn:'Test workshop',taglineAr:'تفاصيل جميلة',taglineEn:'Beautiful details',descriptionAr:'أثاث حسب الطلب',descriptionEn:'Made-to-order furniture',aboutAr:'أثاث حسب الطلب',aboutEn:'Made-to-order furniture',cover:'https://example.com/cover.webp',whatsapp:'+971500000000',quoteEnabled:true,canonicalProviderCode:'BR-2000001'},items:[{entity_type:'product',entity_id:'one',route_key:'wooden-door',studio_model:'wooden-door',title_ar:'باب خشبي',title_en:'Wooden door',description_ar:'تفاصيل الباب',description_en:'Door details',price:800,currency:'AED',price_mode:'from',image_url:'https://example.com/door.webp'},{entity_type:'service',entity_id:'two',title_ar:'تصميم',title_en:'Design'}]};
-let productData={ok:true,product:{name_ar:'باب خشبي',name_en:'Wooden door',description_ar:'باب حسب الطلب',description_en:'A made-to-order door',image_url:'https://example.com/door.webp',gallery:['https://example.com/door.webp','https://example.com/detail.webp'],price:800,currency:'AED',price_mode:'from',sku:'SKU-1',stock_status:'made_to_order'},store_profile:storeData.profile};
-globalThis.fetch=(input,init)=>{const url=String(input);if(url.includes('/rest/v1/marketplace_experience_pages?'))return Promise.resolve(new Response(JSON.stringify(Object.values(published).map(content=>({slug:content.slug,content}))),{headers:{'content-type':'application/json'}}));if(url.includes('/rest/v1/rpc/get_public_market_store_page'))return Promise.resolve(Response.json(JSON.parse(init.body).p_slug==='test-workshop'?storeData:{ok:false}));if(url.includes('/rest/v1/rpc/get_public_market_product_page'))return Promise.resolve(Response.json(JSON.parse(init.body).p_key==='wooden-door'?productData:{ok:false}));if(url.includes('/rest/v1/rpc/get_public_market_store_feed'))return Promise.resolve(Response.json({ok:true,items:JSON.parse(init.body).p_query==='workshop'?[{slug:'test-workshop',name_en:'Test workshop'}]:[]}));if(url.includes('/rest/v1/rpc/get_public_market_product_feed'))return Promise.resolve(Response.json({ok:true,items:JSON.parse(init.body).p_query==='door'?[storeData.items[0]]:[]}));if(url.includes('/rest/v1/rpc/get_public_market_sitemap'))return Promise.resolve(marketSitemapDown?new Response('',{status:503}):Response.json({ok:true,pages:marketSitemap}));return realFetch(input,init)};
+let storeData={ok:true,studio_allowed:true,profile:{slug:'test-workshop',nameAr:'متجر الاختبار',nameEn:'Test workshop',taglineAr:'تفاصيل جميلة',taglineEn:'Beautiful details',descriptionAr:'أثاث حسب الطلب',descriptionEn:'Made-to-order furniture',aboutAr:'أثاث حسب الطلب',aboutEn:'Made-to-order furniture',cover:'https://example.com/cover.webp',whatsapp:'+971500000000',quoteEnabled:true,canonicalProviderCode:'BR-2000001'},items:[{entity_type:'product',entity_id:'one',route_key:'wooden-door',product_slug:'wooden-door',gallery:['https://example.com/door.webp','https://example.com/detail.webp'],rating_value:4,rating_source:'baseline',review_count:0,studio_model:'wooden-door',title_ar:'باب خشبي',title_en:'Wooden door',description_ar:'تفاصيل الباب',description_en:'Door details',price:800,currency:'AED',price_mode:'from',image_url:'https://example.com/door.webp'},{entity_type:'service',entity_id:'two',title_ar:'تصميم',title_en:'Design'}]};
+let productData={ok:true,product:{slug:'wooden-door',route_key:'SKU-1',rating_value:4,rating_source:'baseline',review_count:0,name_ar:'باب خشبي',name_en:'Wooden door',description_ar:'باب حسب الطلب',description_en:'A made-to-order door',image_url:'https://example.com/door.webp',gallery:['https://example.com/door.webp','https://example.com/detail.webp'],price:800,currency:'AED',price_mode:'from',sku:'SKU-1',stock_status:'made_to_order'},store_profile:storeData.profile};
+globalThis.fetch=(input,init)=>{const url=String(input);if(url.includes('/rest/v1/marketplace_experience_pages?'))return Promise.resolve(new Response(JSON.stringify(Object.values(published).map(content=>({slug:content.slug,content}))),{headers:{'content-type':'application/json'}}));if(url.includes('/rest/v1/rpc/get_public_market_store_page'))return Promise.resolve(Response.json(JSON.parse(init.body).p_slug==='test-workshop'?storeData:{ok:false}));if(url.includes('/rest/v1/rpc/get_public_market_named_product_page')){const b=JSON.parse(init.body);return Promise.resolve(Response.json(b.p_store_slug==='test-workshop'&&b.p_product_slug==='wooden-door'?productData:{ok:false}))}if(url.includes('/rest/v1/rpc/get_public_market_product_page'))return Promise.resolve(Response.json(['wooden-door','SKU-1'].includes(JSON.parse(init.body).p_key)?productData:{ok:false}));if(url.includes('/rest/v1/rpc/get_public_market_store_feed'))return Promise.resolve(Response.json({ok:true,items:JSON.parse(init.body).p_query==='workshop'?[{slug:'test-workshop',name_en:'Test workshop'}]:[]}));if(url.includes('/rest/v1/rpc/get_public_market_product_feed'))return Promise.resolve(Response.json({ok:true,items:JSON.parse(init.body).p_query==='door'?[storeData.items[0]]:[]}));if(url.includes('/rest/v1/rpc/get_public_market_sitemap'))return Promise.resolve(marketSitemapDown?new Response('',{status:503}):Response.json({ok:true,pages:marketSitemap}));return realFetch(input,init)};
 
 test('legacy page fragments map to equivalent real paths and retain filters',()=>{
  const cases=[['#home','/'],['#studio','/studio'],['#section?category=kitchen','/categories/kitchen'],['#results?category=furniture&type=product','/search?category=furniture&type=product'],['#info?slug=how-to-buy','/how-to-buy'],['#vision?area=studio','/experiences/design'],['#vision?area=showroom','/experiences/stores'],['#vision?area=projects','/experiences/contracting-services'],['#partners','/experiences/partnerships'],['#detail?type=product','/listing?type=product'],['#store','/store']];
@@ -87,8 +87,8 @@ test('design video is served in browser-friendly byte ranges and retains real ca
 
 test('merchant pages are server-rendered in both languages and reject unpublished records',async()=>{
  for(const [prefix,name,product] of [['','متجر الاختبار','باب خشبي'],['/en','Test workshop','Wooden door']]){
-  const path=prefix+'/stores/test-workshop',r=await response(path),html=await r.text();assert.equal(r.status,200);assert.ok(html.includes(name));assert.ok(html.includes(product));assert.ok(html.includes('data-merchant-ssr'));assert.match(html,/data-merchant-tab="design" aria-pressed="true"/);assert.match(html,/data-merchant-panel="design"><div data-merchant-studio-mount/);assert.match(html,/data-merchant-panel="product" hidden/);const config=JSON.parse(html.match(/<script type="application\/json" id="brx-merchant-data">(.*?)<\/script>/)[1]);assert.deepEqual(config.items.map(x=>x.id),['wooden-door']);assert.equal(config.items[0].model,'wooden-door');assert.ok(html.includes('href="'+prefix+'/product/wooden-door"'));assert.ok(html.includes('href="'+origin+path+'"'));assert.match(html,/rel="alternate" hreflang="ar-AE"/);
-  const pr=await response(prefix+'/product/wooden-door'),ph=await pr.text();assert.equal(pr.status,200);assert.ok(ph.includes(product));assert.ok(ph.includes('detail.webp'));const ld=JSON.parse(ph.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);assert.equal(ld['@type'],'Product');assert.equal(ld.offers,undefined);
+  const path=prefix+'/stores/test-workshop',r=await response(path),html=await r.text();assert.equal(r.status,200);assert.ok(html.includes(name));assert.ok(html.includes(product));assert.ok(html.includes('data-merchant-ssr'));assert.match(html,/data-merchant-tab="design" aria-pressed="true"/);assert.match(html,/data-merchant-panel="design"><div data-merchant-studio-mount/);assert.match(html,/data-merchant-panel="product" hidden/);const config=JSON.parse(html.match(/<script type="application\/json" id="brx-merchant-data">(.*?)<\/script>/)[1]);assert.deepEqual(config.items.map(x=>x.id),['wooden-door']);assert.equal(config.items[0].model,'wooden-door');assert.ok(html.includes('href="'+prefix+'/products/test-workshop/wooden-door"'));assert.ok(html.includes('href="'+origin+path+'"'));assert.match(html,/rel="alternate" hreflang="ar-AE"/);
+  const pr=await response(prefix+'/products/test-workshop/wooden-door'),ph=await pr.text();assert.equal(pr.status,200);assert.ok(ph.includes(product));assert.ok(ph.includes('detail.webp'));const ld=JSON.parse(ph.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);assert.equal(ld['@type'],'Product');assert.equal(ld.offers,undefined);
  }
  assert.equal((await response('/stores/unpublished')).status,404);assert.equal((await response('/product/unpublished')).status,404);
 });
@@ -104,7 +104,7 @@ test('product galleries render distinct safe photos and complete product details
  const prior=productData.product.gallery;
  productData.product.gallery=['https://example.com/door.webp',{url:'https://example.com/detail.webp'},'https://example.com/detail.webp','javascript:alert(1)'];
  try{for(const prefix of ['','/en']){
-  const html=await (await response(prefix+'/product/wooden-door')).text();
+  const html=await (await response(prefix+'/products/test-workshop/wooden-door')).text();
   assert.match(html,/data-merchant-slug="test-workshop"/);
   assert.match(html,/class="merchant-product-image merchant-feature" src="https:\/\/example.com\/door.webp"/);
   assert.equal([...html.matchAll(/data-merchant-photo=/g)].length,2);
@@ -121,7 +121,7 @@ test('merchant quote configuration uses only enabled contact and the real app ro
 
 test('product structured data does not promise checkout while the public purchase flow is disabled',async()=>{
  productData.product.checkout_enabled=true;productData.product.price_mode='fixed';productData.product.stock_status='in_stock';
- const html=await (await response('/product/wooden-door')).text();const schema=JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);assert.equal(schema.offers,undefined);
+ const html=await (await response('/products/test-workshop/wooden-door')).text();const schema=JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);assert.equal(schema.offers,undefined);
  productData.product.checkout_enabled=false;productData.product.price_mode='from';productData.product.stock_status='made_to_order';
 });
 
@@ -137,8 +137,8 @@ test('public store directory forwards search and exposes only the source feed',a
 });
 
 test('sitemap updates dynamically for published merchant pages and fails safely on source errors',async()=>{
- marketSitemap=[{path:'/stores/test-workshop',image:'https://example.com/cover.webp',updated_at:'2026-11-01T00:00:00Z'},{path:'/product/wooden-door',image:'https://example.com/door.webp',images:['https://example.com/door.webp','https://example.com/detail.webp',{url:'https://example.com/finish.webp'},'javascript:alert(1)']},{path:'/stores/invalid?redirect=x'}];
- const xml=await (await response('/sitemap.xml')).text();for(const path of ['/stores/test-workshop','/en/stores/test-workshop','/product/wooden-door','/en/product/wooden-door'])assert.ok(xml.includes('<loc>'+origin+path+'</loc>'));for(const src of ['door.webp','detail.webp','finish.webp'])assert.equal(xml.split('https://example.com/'+src).length-1,2);assert.ok(!xml.includes('javascript:alert'));assert.ok(!xml.includes('invalid?redirect'));
+ marketSitemap=[{path:'/stores/test-workshop',image:'https://example.com/cover.webp',updated_at:'2026-11-01T00:00:00Z'},{path:'/products/test-workshop/wooden-door',image:'https://example.com/door.webp',images:['https://example.com/door.webp','https://example.com/detail.webp',{url:'https://example.com/finish.webp'},'javascript:alert(1)']},{path:'/stores/invalid?redirect=x'}];
+ const xml=await (await response('/sitemap.xml')).text();for(const path of ['/stores/test-workshop','/en/stores/test-workshop','/products/test-workshop/wooden-door','/en/products/test-workshop/wooden-door'])assert.ok(xml.includes('<loc>'+origin+path+'</loc>'));for(const src of ['door.webp','detail.webp','finish.webp'])assert.equal(xml.split('https://example.com/'+src).length-1,2);assert.ok(!xml.includes('javascript:alert'));assert.ok(!xml.includes('invalid?redirect'));
  marketSitemap=[];assert.ok(!(await (await response('/sitemap.xml')).text()).includes('/stores/test-workshop'));
  marketSitemapDown=true;assert.equal((await response('/sitemap.xml')).status,503);marketSitemapDown=false;
 });
@@ -150,9 +150,17 @@ test('marketplace content updates without rebuilding and escapes merchant conten
 });
 
 
-test('legacy product aliases redirect to their stable product identity',async()=>{
- productData.product.route_key='SKU-1';
- const r=await response('/product/wooden-door?utm_source=test');
- assert.equal(r.status,301);assert.equal(r.headers.get('location'),origin+'/product/SKU-1?utm_source=test');
- delete productData.product.route_key;
+test('legacy IDs and aliases redirect to named routes, preserving language and query',async()=>{
+ for(const [oldPath,target] of [['/product/SKU-1?utm_source=test','/products/test-workshop/wooden-door?utm_source=test'],['/en/product/wooden-door','/en/products/test-workshop/wooden-door']]){
+  const r=await response(oldPath);assert.equal(r.status,301);assert.equal(r.headers.get('location'),origin+target);
+ }
+ assert.equal((await response('/products/wrong-store/wooden-door')).status,404);
+});
+
+test('ratings never treat a baseline as a customer review',async()=>{
+ let html=await (await response('/products/test-workshop/wooden-door')).text();
+ assert.ok(html.includes('☆☆☆☆☆'));assert.ok(html.includes('لا توجد تقييمات بعد'));assert.ok(!html.includes('4.0 (0)'));
+ productData.product.rating_source='community';productData.product.review_count=3;productData.product.rating_value=4.5;
+ try{html=await (await response('/products/test-workshop/wooden-door')).text();assert.ok(html.includes('4.5 (3)'));assert.ok(html.includes('★★★★★'))}
+ finally{productData.product.rating_source='baseline';productData.product.review_count=0;productData.product.rating_value=4}
 });

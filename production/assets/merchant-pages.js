@@ -1,9 +1,12 @@
 // Tabs progressively enhance server-rendered store sections; the source HTML remains complete.
 document.addEventListener('click',event=>{
- const photo=event.target.closest('[data-merchant-photo]');
- if(photo){
-  const gallery=photo.closest('[data-merchant-gallery]'),feature=gallery?.querySelector('.merchant-feature');
-  if(feature){feature.src=photo.dataset.merchantPhoto;gallery.querySelectorAll('[data-merchant-photo]').forEach(x=>x.setAttribute('aria-pressed',String(x===photo)))}
+ const cardPhoto=event.target.closest('[data-card-photo]');
+ if(cardPhoto){const card=cardPhoto.closest('.merchant-card'),image=card?.querySelector('.merchant-card-image');if(image){image.src=cardPhoto.dataset.cardPhoto;card.querySelectorAll('[data-card-photo]').forEach(x=>x.setAttribute('aria-pressed',String(x===cardPhoto)))}return}
+ const photo=event.target.closest('[data-merchant-photo]'),step=event.target.closest('[data-gallery-step]');
+ if(photo||step){
+  const gallery=(photo||step).closest('[data-merchant-gallery]'),feature=gallery?.querySelector('.merchant-feature'),buttons=[...gallery.querySelectorAll('[data-merchant-photo]')];
+  let chosen=photo;if(step&&buttons.length){const current=Math.max(0,buttons.findIndex(x=>x.getAttribute('aria-pressed')==='true'));chosen=buttons[(current+Number(step.dataset.galleryStep)+buttons.length)%buttons.length]}
+  if(feature&&chosen){feature.src=chosen.dataset.merchantPhoto;buttons.forEach(x=>x.setAttribute('aria-pressed',String(x===chosen)));const counter=gallery.querySelector('.merchant-gallery-counter');if(counter)counter.textContent=(buttons.indexOf(chosen)+1)+' / '+buttons.length}
   return;
  }
  const tab=event.target.closest('[data-merchant-tab]');if(!tab)return;

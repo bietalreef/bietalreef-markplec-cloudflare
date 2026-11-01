@@ -12,6 +12,28 @@ function BR_MARKET_SEGMENT(value){const x=String(value||'');return /^[A-Za-z0-9]
 function BR_MARKET_IMAGE(value,alt,cls=''){
  const src=BR_MARKET_URL(value);return src?'<img class="'+cls+'" src="'+BR_ESC(src)+'" alt="'+BR_ESC(alt)+'" '+(/merchant-cover-image|merchant-feature/.test(cls)?'loading="eager" fetchpriority="high"':'loading="lazy"')+' decoding="async">':'';
 }
+function BR_MARKET_PRODUCT_PATH(store,slug,key,en){
+ const shop=BR_MARKET_SEGMENT(store),name=BR_MARKET_SEGMENT(slug),legacy=BR_MARKET_SEGMENT(key),prefix=en?'/en':'';
+ if(shop&&name)return prefix+'/products/'+encodeURIComponent(shop)+'/'+encodeURIComponent(name);
+ return legacy?prefix+'/product/'+encodeURIComponent(legacy):'';
+}
+function BR_MARKET_PHOTOS(item){
+ const gallery=Array.isArray(item.gallery)?item.gallery:[];
+ return [BR_MARKET_URL(item.image_url),...gallery.map(x=>BR_MARKET_URL(typeof x==='string'?x:x?.url))].filter((x,i,a)=>x&&a.indexOf(x)===i).slice(0,12);
+}
+function BR_MARKET_RATING(item,en){
+ const n=Number(item.review_count)||0,value=Number(item.rating_value),has=n>0&&item.rating_source==='community'&&Number.isFinite(value)&&value>=1&&value<=5;
+ const label=has?(en?value.toFixed(1)+' out of 5, '+n+' reviews':value.toFixed(1)+' من 5، عدد التقييمات '+n):(en?'No reviews yet':'لا توجد تقييمات بعد');
+ const stars=has?'★'.repeat(Math.round(value))+'☆'.repeat(5-Math.round(value)):'☆☆☆☆☆';
+ return '<div class="merchant-rating" aria-label="'+BR_ESC(label)+'"><span aria-hidden="true">'+stars+'</span><small>'+(has?BR_ESC(value.toFixed(1)+' ('+n+')'):BR_ESC(en?'No reviews yet':'لا توجد تقييمات بعد'))+'</small></div>';
+}
+function BR_MARKET_CARD_MEDIA(item,title,href,en){
+ const photos=BR_MARKET_PHOTOS(item);if(!photos.length)return '';
+ const image=BR_MARKET_IMAGE(photos[0],title,'merchant-card-image');
+ const main=href?'<a class="merchant-card-image-link" href="'+BR_ESC(href)+'">'+image+'</a>':'<div class="merchant-card-image-link">'+image+'</div>';
+ const thumbs=photos.length>1?'<div class="merchant-card-thumbs" aria-label="'+(en?'Product photos':'صور المنتج')+'">'+photos.map((src,i)=>'<button type="button" data-card-photo="'+BR_ESC(src)+'" aria-pressed="'+String(i===0)+'" aria-label="'+(en?'View photo ':'عرض الصورة ')+(i+1)+'">'+BR_MARKET_IMAGE(src,'','merchant-card-thumb')+'</button>').join('')+'</div>':'';
+ return main+thumbs;
+}
 function BR_MARKET_PRICE(item,en){
  const mode=String(item.price_mode||'');const val=Number(item.price??item.price_from);const currency=String(item.currency||'AED');
  if(mode==='quote_required'||mode==='quote'||!Number.isFinite(val)||val<=0||!/^[A-Z]{3}$/.test(currency))return en?'Request a quote':'اطلب عرض سعر';
@@ -33,13 +55,13 @@ function BR_RENDER_STORE(data,en){
  const groups=[['product',en?'Products':'المنتجات'],['service',en?'Services':'الخدمات'],['offer',en?'Offers':'العروض'],['project',en?'Projects':'الأعمال والمشاريع']].map(([key,label])=>({key,label,items:items.filter(x=>x.entity_type===key)})).filter(g=>g.items.length);
  const cover=BR_MARKET_URL(p.cover),logo=BR_MARKET_URL(p.logo),contact=BR_MARKET_CONTACT(p,en);
  const chars=Array.from(description),short=chars.length>150?chars.slice(0,150).join('').trim():description,more=chars.length>150?chars.slice(150).join('').trim():'';
- const cards=g=>g.items.map(x=>{const title=BR_MARKET_TEXT(en?x.title_en:x.title_ar,en,en?'Product':'منتج'),desc=BR_MARKET_TEXT(en?x.description_en:x.description_ar,en,''),key=BR_MARKET_SEGMENT(x.route_key||x.public_id||x.entity_id),href=g.key==='product'&&key?prefix+'/product/'+encodeURIComponent(key):'';
-  const content=BR_MARKET_IMAGE(x.image_url,title,'merchant-card-image')+'<div class="merchant-card-copy"><h3>'+BR_ESC(title)+'</h3>'+(desc?'<p>'+BR_ESC(desc)+'</p>':'')+(g.key==='product'?'<strong>'+BR_ESC(BR_MARKET_PRICE(x,en))+'</strong>':'')+(href?'<span>'+(en?'View details':'عرض التفاصيل')+' ↗</span>':'')+'</div>';
-  return href?'<a class="merchant-card" href="'+href+'">'+content+'</a>':'<article class="merchant-card">'+content+'</article>';
+ const cards=g=>g.items.map(x=>{const title=BR_MARKET_TEXT(en?x.title_en:x.title_ar,en,en?'Product':'منتج'),desc=BR_MARKET_TEXT(en?x.description_en:x.description_ar,en,''),key=BR_MARKET_SEGMENT(x.route_key||x.public_id||x.entity_id),href=g.key==='product'?BR_MARKET_PRODUCT_PATH(p.slug,x.product_slug,key,en):'';
+  const text='<h3>'+BR_ESC(title)+'</h3>'+(desc?'<p>'+BR_ESC(desc)+'</p>':'')+(g.key==='product'?BR_MARKET_RATING(x,en)+'<strong>'+BR_ESC(BR_MARKET_PRICE(x,en))+'</strong>':'')+(href?'<span class="merchant-card-action">'+(en?'View details':'عرض التفاصيل')+' ↗</span>':'');
+  return '<article class="merchant-card">'+BR_MARKET_CARD_MEDIA(x,title,href,en)+(href?'<a class="merchant-card-copy" href="'+BR_ESC(href)+'">'+text+'</a>':'<div class="merchant-card-copy">'+text+'</div>')+'</article>';
  }).join('');
  const products=groups.find(g=>g.key==='product');
  const models=['wooden-kitchen','wooden-wardrobe','wooden-door'];
- const studioItems=data.studio_allowed===true&&products?products.items.filter(x=>models.includes(x.studio_model)&&BR_MARKET_SEGMENT(x.route_key)).map(x=>({id:BR_MARKET_SEGMENT(x.route_key),model:x.studio_model,ar:BR_MARKET_TEXT(x.title_ar,false,'منتج'),en:BR_MARKET_TEXT(x.title_en,true,'Product'),image:BR_MARKET_URL(x.image_url),href:prefix+'/product/'+encodeURIComponent(x.route_key)})):[];
+ const studioItems=data.studio_allowed===true&&products?products.items.filter(x=>models.includes(x.studio_model)&&BR_MARKET_SEGMENT(x.route_key)).map(x=>({id:BR_MARKET_SEGMENT(x.route_key),model:x.studio_model,ar:BR_MARKET_TEXT(x.title_ar,false,'منتج'),en:BR_MARKET_TEXT(x.title_en,true,'Product'),image:BR_MARKET_URL(x.image_url),href:BR_MARKET_PRODUCT_PATH(p.slug,x.product_slug,x.route_key,en)})):[];
  const hasStudio=studioItems.length>0,selected=hasStudio?'design':(groups[0]?.key||'about');
  const tabs=(hasStudio?'<button type="button" data-merchant-tab="design" aria-pressed="true">'+(en?'Design':'التصميم')+'</button>':'')+groups.map(g=>'<button type="button" data-merchant-tab="'+g.key+'" aria-pressed="'+String(g.key===selected)+'">'+g.label+'</button>').join('');
  const wa=String(p.whatsapp||'').replace(/\D/g,'').replace(/^00/,'');
@@ -50,13 +72,13 @@ function BR_RENDER_STORE(data,en){
 }
 function BR_RENDER_PRODUCT(data,en){
  const p=data.product||{},s=data.store_profile||{},prefix=en?'/en':'',name=BR_MARKET_TEXT(en?p.name_en:p.name_ar,en,en?'Product':'منتج'),store=BR_MARKET_TEXT(en?s.nameEn:s.nameAr,en,en?'Store':'المتجر'),description=BR_MARKET_TEXT(en?p.description_en:p.description_ar,en,''),slug=BR_MARKET_SEGMENT(s.slug),cover=BR_MARKET_URL(p.image_url),gallery=Array.isArray(p.gallery)?p.gallery:[];
- const photos=[cover,...gallery.map(x=>typeof x==='string'?BR_MARKET_URL(x):BR_MARKET_URL(x?.url))].filter((x,i,a)=>x&&a.indexOf(x)===i);
- const photo=photos.length?'<div class="merchant-product-gallery" data-merchant-gallery><div class="merchant-gallery-feature">'+BR_MARKET_IMAGE(photos[0],name,'merchant-product-image merchant-feature')+'</div>'+(photos.length>1?'<div class="merchant-gallery-thumbs" aria-label="'+(en?'Product photos':'صور المنتج')+'">'+photos.map((src,i)=>'<button type="button" data-merchant-photo="'+BR_ESC(src)+'" aria-pressed="'+String(i===0)+'" aria-label="'+(en?'View photo ':'عرض الصورة ')+(i+1)+'">'+BR_MARKET_IMAGE(src,'','merchant-gallery-thumb')+'</button>').join('')+'</div>':'')+'</div>':'';
+ const photos=BR_MARKET_PHOTOS(p);
+ const photo=photos.length?'<div class="merchant-product-gallery" data-merchant-gallery><div class="merchant-gallery-feature">'+BR_MARKET_IMAGE(photos[0],name,'merchant-product-image merchant-feature')+(photos.length>1?'<button type="button" class="merchant-gallery-prev" data-gallery-step="-1" aria-label="'+(en?'Previous photo':'الصورة السابقة')+'">‹</button><button type="button" class="merchant-gallery-next" data-gallery-step="1" aria-label="'+(en?'Next photo':'الصورة التالية')+'">›</button><span class="merchant-gallery-counter" aria-live="polite">1 / '+photos.length+'</span>':'')+'</div>'+(photos.length>1?'<div class="merchant-gallery-thumbs" aria-label="'+(en?'Product photos':'صور المنتج')+'">'+photos.map((src,i)=>'<button type="button" data-merchant-photo="'+BR_ESC(src)+'" aria-pressed="'+String(i===0)+'" aria-label="'+(en?'View photo ':'عرض الصورة ')+(i+1)+'">'+BR_MARKET_IMAGE(src,'','merchant-gallery-thumb')+'</button>').join('')+'</div>':'')+'</div>':'';
  const knownStock={made_to_order:en?'Made to order':'يُصنع حسب الطلب',in_stock:en?'Available':'متوفر',out_of_stock:en?'Out of stock':'غير متوفر'};
  const facts=[p.brand_text?[en?'Brand':'العلامة',BR_MARKET_TEXT(p.brand_text,en,'')]:null,knownStock[p.stock_status]?[en?'Availability':'حالة المنتج',knownStock[p.stock_status]]:null].filter(x=>x&&x[1]);
  const summary=description?Array.from(description).slice(0,125).join('').trim():'';
  const info=description?'<p class="merchant-product-summary">'+BR_ESC(summary)+(Array.from(description).length>125?'…':'')+'</p><details class="merchant-product-details" data-product-details open><summary>'+(en?'Full product details':'تفاصيل المنتج')+'</summary><p>'+BR_ESC(description)+'</p></details>':'';
- return '<div class="merchant-page wrap" data-nv-page="public-product" data-merchant-ssr data-merchant-kind="product" data-merchant-slug="'+BR_ESC(slug)+'"><nav class="merchant-crumb"><a href="'+(en?'/en/':'/')+'">'+(en?'Home':'الرئيسية')+'</a>'+(slug?' / <a href="'+prefix+'/stores/'+encodeURIComponent(slug)+'">'+BR_ESC(store)+'</a>':'')+' / '+BR_ESC(name)+'</nav><article class="merchant-product">'+photo+'<div class="merchant-product-info"><small>'+BR_ESC(store)+'</small><h1>'+BR_ESC(name)+'</h1><p class="merchant-product-price">'+BR_ESC(BR_MARKET_PRICE(p,en))+'</p>'+(facts.length?'<dl class="merchant-product-facts">'+facts.map(([label,value])=>'<div><dt>'+BR_ESC(label)+'</dt><dd>'+BR_ESC(value)+'</dd></div>').join('')+'</dl>':'')+info+'<div class="merchant-actions">'+BR_MARKET_CONTACT(s,en)+(slug?'<a class="merchant-button merchant-secondary" href="'+prefix+'/stores/'+encodeURIComponent(slug)+'">'+(en?'Visit store':'زيارة المتجر')+' ↗</a>':'')+'</div></div></article></div>';
+ return '<div class="merchant-page wrap" data-nv-page="public-product" data-merchant-ssr data-merchant-kind="product" data-merchant-slug="'+BR_ESC(slug)+'"><nav class="merchant-crumb"><a href="'+(en?'/en/':'/')+'">'+(en?'Home':'الرئيسية')+'</a>'+(slug?' / <a href="'+prefix+'/stores/'+encodeURIComponent(slug)+'">'+BR_ESC(store)+'</a>':'')+' / '+BR_ESC(name)+'</nav><article class="merchant-product">'+photo+'<div class="merchant-product-info"><small>'+BR_ESC(store)+'</small><h1>'+BR_ESC(name)+'</h1>'+BR_MARKET_RATING(p,en)+'<p class="merchant-product-price">'+BR_ESC(BR_MARKET_PRICE(p,en))+'</p>'+(facts.length?'<dl class="merchant-product-facts">'+facts.map(([label,value])=>'<div><dt>'+BR_ESC(label)+'</dt><dd>'+BR_ESC(value)+'</dd></div>').join('')+'</dl>':'')+info+'<div class="merchant-actions">'+BR_MARKET_CONTACT(s,en)+(slug?'<a class="merchant-button merchant-secondary" href="'+prefix+'/stores/'+encodeURIComponent(slug)+'">'+(en?'Visit store':'زيارة المتجر')+' ↗</a>':'')+'</div></div></article></div>';
 }
 function BR_MARKET_SEO(data,kind,en,canonical){
  const p=kind==='store'?data.profile:data.product, name=kind==='store'?BR_MARKET_TEXT(en?p.nameEn:p.nameAr,en,en?'Store':'متجر'):BR_MARKET_TEXT(en?p.name_en:p.name_ar,en,en?'Product':'منتج'),desc=kind==='store'?BR_MARKET_TEXT(en?p.descriptionEn:p.descriptionAr,en,''):BR_MARKET_TEXT(en?p.description_en:p.description_ar,en,''),img=BR_MARKET_URL(kind==='store'?p.cover:p.image_url);
@@ -66,10 +88,10 @@ function BR_MARKET_SEO(data,kind,en,canonical){
  // Offer to search engines until the public purchase flow actually works.
  return '<meta property="og:type" content="website"><meta property="og:title" content="'+BR_ESC(name)+'"><meta property="og:description" content="'+BR_ESC(desc)+'"><meta property="og:url" content="'+BR_ESC(canonical)+'">'+(img?'<meta property="og:image" content="'+BR_ESC(img.startsWith('/')?'https://app.bietalreef.ae'+img:img)+'">':'')+'<script type="application/ld+json">'+JSON.stringify(schema).replace(/</g,'\\u003c')+'</script>';
 }
-async function BR_LOAD_MARKET_PAGE(kind,key){
- const fn=kind==='store'?'get_public_market_store_page':'get_public_market_product_page',body=kind==='store'?{p_slug:key}:{p_key:key};
- try{const res=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(6000)});if(!res.ok)return {error:true};const data=await res.json();if(!data||data.ok!==true)return {missing:true};if(kind==='store'&&(!data.profile||!Array.isArray(data.items)))return {error:true};if(kind==='product'&&(!data.product||!data.store_profile))return {error:true};return {data}}catch{return {error:true}}
+async function BR_LOAD_MARKET_PAGE(kind,key,productSlug){
+ const fn=kind==='store'?'get_public_market_store_page':kind==='named-product'?'get_public_market_named_product_page':'get_public_market_product_page',body=kind==='store'?{p_slug:key}:kind==='named-product'?{p_store_slug:key,p_product_slug:productSlug}:{p_key:key};
+ try{const res=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(6000)});if(!res.ok)return {error:true};const data=await res.json();if(!data||data.ok!==true)return {missing:true};if(kind==='store'&&(!data.profile||!Array.isArray(data.items)))return {error:true};if(kind!=='store'&&(!data.product||!data.store_profile))return {error:true};return {data}}catch{return {error:true}}
 }
 async function BR_LOAD_MARKET_SITEMAP(){
- try{const res=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/get_public_market_sitemap',{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(6000)});if(!res.ok)return null;const data=await res.json();if(!data||data.ok!==true||!Array.isArray(data.pages)||data.pages.length>12000)return null;return data.pages.filter(x=>/^\/(?:stores|product)\/[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(x?.path||''));}catch{return null}
+ try{const res=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/get_public_market_sitemap',{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(6000)});if(!res.ok)return null;const data=await res.json();if(!data||data.ok!==true||!Array.isArray(data.pages)||data.pages.length>12000)return null;return data.pages.filter(x=>/^\/(?:(?:stores|product)\/[A-Za-z0-9][A-Za-z0-9_-]{0,159}|products\/[a-z0-9][a-z0-9-]{0,119}\/[a-z0-9][a-z0-9-]{0,159})$/.test(x?.path||''));}catch{return null}
 }

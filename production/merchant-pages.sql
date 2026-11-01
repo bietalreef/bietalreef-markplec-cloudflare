@@ -34,12 +34,13 @@ begin
   select coalesce(jsonb_agg(
     (case when item->>'price_mode'='quote_required' then item - 'price' - 'price_from' - 'price_to' else item end - 'studio_model')
     || case when legacy.sku is not null then jsonb_strip_nulls(jsonb_build_object(
+      'product_slug',legacy.slug, 'gallery',legacy.product_data->'gallery', 'rating_value',legacy.product_data->'rating_value', 'rating_source',legacy.product_data->'rating_source', 'review_count',legacy.product_data->'review_count',
       'studio_model',case when legacy.specifications->>'studio_model' in ('wooden-kitchen','wooden-wardrobe','wooden-door') then legacy.specifications->>'studio_model' else null end,
       'details',(case when jsonb_typeof(item->'details')='object' then item->'details' else '{}'::jsonb end)||jsonb_strip_nulls(jsonb_build_object('sku',legacy.sku,'price_unit_ar',legacy.specifications->>'price_unit_ar','price_unit_en',legacy.specifications->>'price_unit_en'))
     )) else '{}'::jsonb end order by ord),'[]'::jsonb) into v_items
   from jsonb_array_elements(v_items) with ordinality x(item,ord)
   left join lateral (
-    select p.sku,p.specifications from public.provider_products p
+    select p.sku,p.specifications,case when p.slug ~ '^[a-z0-9][a-z0-9-]{0,159}$' and 1=(select count(*) from public.provider_products p2 where p2.provider_id=p.provider_id and p2.is_published and p2.slug=p.slug) then p.slug end as slug, public.get_public_marketplace_product(p.sku)->'product' as product_data from public.provider_products p
     where item->>'entity_type'='product' and p.provider_id=v_id and p.is_published
       and (p.sku=coalesce(item->'details'->>'sku',item->>'route_key','') or p.id::text=coalesce(item->>'entity_id',''))
     limit 1
@@ -48,7 +49,9 @@ begin
   select coalesce(jsonb_agg(jsonb_build_object(
     'entity_type','product','entity_id',p.id,'route_key',p.sku,
     'title_ar',p.name_ar,'title_en',p.name_en,'description_ar',p.description_ar,'description_en',p.description_en,
-    'image_url',p.image_url,'price',case when p.price_visibility in ('public','starting_from') then p.price else null end,'currency',p.currency,
+    'image_url',p.image_url,'product_slug',case when p.slug ~ '^[a-z0-9][a-z0-9-]{0,159}$' and 1=(select count(*) from public.provider_products p2 where p2.provider_id=p.provider_id and p2.is_published and p2.slug=p.slug) then p.slug end,
+    'gallery',checked.data->'product'->'gallery','rating_value',checked.data->'product'->'rating_value','rating_source',checked.data->'product'->'rating_source','review_count',checked.data->'product'->'review_count',
+    'price',case when p.price_visibility in ('public','starting_from') then p.price else null end,'currency',p.currency,
     'price_mode',case p.price_visibility when 'starting_from' then 'from' when 'public' then 'fixed' else 'quote_required' end,
     'studio_model',case when p.specifications->>'studio_model' in ('wooden-kitchen','wooden-wardrobe','wooden-door') then p.specifications->>'studio_model' else null end,
     'details',jsonb_build_object('sku',p.sku,'price_unit_ar',p.specifications->>'price_unit_ar','price_unit_en',p.specifications->>'price_unit_en')
@@ -65,7 +68,7 @@ grant execute on function public.get_public_market_store_page(text) to anon,auth
 
 create or replace function public.get_public_market_product_page(p_key text)
 returns jsonb language plpgsql stable security definer set search_path = '' as $fn$
-declare v_data jsonb; v_store jsonb; v_slug text; v_matching_slugs integer; v_units jsonb;
+declare v_data jsonb; v_store jsonb; v_slug text; v_product_slug text; v_matching_slugs integer; v_units jsonb;
 begin
   if p_key is null or btrim(p_key) !~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$' then
     return jsonb_build_object('ok',false,'code','PRODUCT_NOT_PUBLIC');
@@ -85,9 +88,10 @@ begin
     select jsonb_strip_nulls(jsonb_build_object(
       'price_unit_ar',nullif(p.specifications->>'price_unit_ar',''),
       'price_unit_en',nullif(p.specifications->>'price_unit_en','')
-    )) into v_units from public.provider_products p
+    )),case when p.slug ~ '^[a-z0-9][a-z0-9-]{0,159}$' and 1=(select count(*) from public.provider_products p2 where p2.provider_id=p.provider_id and p2.is_published and p2.slug=p.slug) then p.slug end into v_units,v_product_slug from public.provider_products p
     where p.is_published and p.id::text=v_data->'product'->>'id'
       and p.provider_id::text=v_data->'product'->>'provider_id' limit 1;
+    if v_product_slug is not null then v_data:=jsonb_set(v_data,'{product,slug}',to_jsonb(v_product_slug),true); end if;
     if v_units is not null then
       v_data:=jsonb_set(v_data,'{product,specifications}',
         coalesce(v_data->'product'->'specifications','{}'::jsonb)||v_units,true);
@@ -100,6 +104,30 @@ begin
 end; $fn$;
 revoke all on function public.get_public_market_product_page(text) from public;
 grant execute on function public.get_public_market_product_page(text) to anon,authenticated;
+
+-- Resolve descriptive URLs within one published merchant, so identical names at
+-- different stores cannot select or disclose another merchant's product.
+create or replace function public.get_public_market_named_product_page(p_store_slug text,p_product_slug text)
+returns jsonb language plpgsql stable security definer set search_path = '' as $fn$
+declare v_sku text; v_matches integer; v_data jsonb;
+begin
+  if p_store_slug is null or p_store_slug !~ '^[a-z0-9][a-z0-9-]{0,119}$'
+     or p_product_slug is null or p_product_slug !~ '^[a-z0-9][a-z0-9-]{0,159}$' then
+    return jsonb_build_object('ok',false,'code','PRODUCT_NOT_PUBLIC');
+  end if;
+  select count(*),min(p.sku) into v_matches,v_sku from public.provider_products p
+    join public.provider_public_profiles pub on pub.id=p.provider_id
+    where pub.slug=p_store_slug and p.slug=p_product_slug and p.is_published;
+  if v_matches<>1 then return jsonb_build_object('ok',false,'code','PRODUCT_NOT_PUBLIC'); end if;
+  v_data:=public.get_public_market_product_page(v_sku);
+  if v_data->>'ok' is distinct from 'true' or v_data->'store_profile'->>'slug' is distinct from p_store_slug
+     or v_data->'product'->>'slug' is distinct from p_product_slug then
+    return jsonb_build_object('ok',false,'code','PRODUCT_NOT_PUBLIC');
+  end if;
+  return v_data;
+end; $fn$;
+revoke all on function public.get_public_market_named_product_page(text,text) from public;
+grant execute on function public.get_public_market_named_product_page(text,text) to anon,authenticated;
 
 -- Read live, eligible product records; never synthesize or expose draft listings.
 create or replace function public.get_public_market_product_feed(p_query text default '')
@@ -169,9 +197,13 @@ begin
       v_product:=public.get_public_marketplace_product(v_key);
       if v_product->>'ok' is distinct from 'true' or v_product->'provider'->>'slug'<>v_store.slug then continue; end if;
       v_key:=v_product->'product'->>'route_key';
-      if v_key is null or v_key !~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$' or v_key=any(v_seen) then continue; end if;
-      v_seen:=array_append(v_seen,v_key);
-      v_pages:=v_pages||jsonb_build_array(jsonb_strip_nulls(jsonb_build_object('path','/product/'||v_key,'image',nullif(v_product->'product'->>'image_url',''),'images',case when jsonb_typeof(v_product->'product'->'gallery')='array' then v_product->'product'->'gallery' else '[]'::jsonb end,'updated_at',nullif(v_product->'product'->>'updated_at',''))));
+      if v_key is null or v_key !~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$' then continue; end if;
+      if coalesce(v_item->>'product_slug','')<>'' and public.get_public_market_named_product_page(v_store.slug,v_item->>'product_slug')->>'ok'='true' then
+        v_path:='/products/'||v_store.slug||'/'||(v_item->>'product_slug');
+      else v_path:='/product/'||v_key; end if;
+      if v_path=any(v_seen) then continue; end if;
+      v_seen:=array_append(v_seen,v_path);
+      v_pages:=v_pages||jsonb_build_array(jsonb_strip_nulls(jsonb_build_object('path',v_path,'image',nullif(v_product->'product'->>'image_url',''),'images',case when jsonb_typeof(v_product->'product'->'gallery')='array' then v_product->'product'->'gallery' else '[]'::jsonb end,'updated_at',nullif(v_product->'product'->>'updated_at',''))));
       if jsonb_array_length(v_pages)>=12000 then return jsonb_build_object('ok',true,'pages',v_pages); end if;
     end loop;
     if jsonb_array_length(v_pages)>=12000 then return jsonb_build_object('ok',true,'pages',v_pages); end if;

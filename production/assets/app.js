@@ -79,7 +79,24 @@ async function loadMarketProducts(params){
  const mount=content.querySelector('[data-market-products]');if(!mount)return;const en=document.documentElement.lang.startsWith('en');
  try{const response=await fetch('/api/public-market-products?q='+encodeURIComponent((params.get('q')||'').slice(0,100)));if(!response.ok)throw new Error('feed');const data=await response.json();if(!mount.isConnected)return;
   const items=Array.isArray(data.items)?data.items:[];const prefix=en?'/en':'';
-  mount.innerHTML=items.length?'<div class="merchant-grid">'+items.map(x=>{const key=String(x.route_key||'');if(!/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(key))return '';const title=String((en?x.title_en:x.title_ar)||''),store=String((en?x.store_name_en:x.store_name_ar)||''),img=String(x.image_url||''),validImage=img.startsWith('/')&&!img.startsWith('//')||/^https:\/\//.test(img);let price=en?'Request a quote':'اطلب عرض سعر';const value=Number(x.price),currency=String(x.currency||'AED');if(['fixed','from'].includes(x.price_mode)&&Number.isFinite(value)&&value>0&&/^[A-Z]{3}$/.test(currency)){price=(x.price_mode==='from'?(en?'From ':'يبدأ من '):'')+new Intl.NumberFormat(en?'en-AE':'ar-AE',{style:'currency',currency}).format(value);const unit=en?x.details?.price_unit_en:x.details?.price_unit_ar;if(unit)price+=' '+unit}return '<a class="merchant-card" href="'+prefix+'/product/'+encodeURIComponent(key)+'">'+(validImage?'<img class="merchant-card-image" loading="lazy" src="'+escapeHTML(img)+'" alt="'+escapeHTML(title)+'">':'')+'<div class="merchant-card-copy"><small>'+escapeHTML(store)+'</small><h3>'+escapeHTML(title)+'</h3><strong>'+escapeHTML(price)+'</strong><span>'+(en?'View details':'عرض التفاصيل')+' ↗</span></div></a>'}).join('')+'</div>':'<p class="merchant-empty">'+(en?'No products found.':'لا توجد منتجات متاحة لهذا البحث.')+'</p>';
+  const safeImage=value=>{const u=String(value||'');return u.length<2049&&((u.startsWith('/')&&!u.startsWith('//')&&!u.includes('\\'))||/^https:\/\//.test(u))?u:''};
+  mount.innerHTML=items.length?'<div class="merchant-grid">'+items.map(x=>{
+   const key=String(x.route_key||''),shop=String(x.store_slug||''),slug=String(x.product_slug||'');
+   if(!/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(key))return '';
+   const named=/^[a-z0-9][a-z0-9-]{0,119}$/.test(shop)&&/^[a-z0-9][a-z0-9-]{0,159}$/.test(slug);
+   const href=prefix+(named?'/products/'+encodeURIComponent(shop)+'/'+encodeURIComponent(slug):'/product/'+encodeURIComponent(key));
+   const title=String((en?x.title_en:x.title_ar)||''),store=String((en?x.store_name_en:x.store_name_ar)||'');
+   const gallery=Array.isArray(x.gallery)?x.gallery:[],photos=[safeImage(x.image_url),...gallery.map(v=>safeImage(typeof v==='string'?v:v?.url))].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,12);
+   let price=en?'Request a quote':'اطلب عرض سعر';const value=Number(x.price),currency=String(x.currency||'AED');
+   if(['fixed','from'].includes(x.price_mode)&&Number.isFinite(value)&&value>0&&/^[A-Z]{3}$/.test(currency)){price=(x.price_mode==='from'?(en?'From ':'يبدأ من '):'')+new Intl.NumberFormat(en?'en-AE':'ar-AE',{style:'currency',currency}).format(value);const unit=en?x.details?.price_unit_en:x.details?.price_unit_ar;if(unit)price+=' '+unit}
+   const count=Number(x.review_count)||0,rating=Number(x.rating_value),has=count>0&&x.rating_source==='community'&&Number.isFinite(rating)&&rating>=1&&rating<=5;
+   const ratingLabel=has?(en?rating.toFixed(1)+' out of 5, '+count+' reviews':rating.toFixed(1)+' من 5، عدد التقييمات '+count):(en?'No reviews yet':'لا توجد تقييمات بعد');
+   const stars=has?'★'.repeat(Math.round(rating))+'☆'.repeat(5-Math.round(rating)):'☆☆☆☆☆';
+   const ratingHtml='<div class="merchant-rating" aria-label="'+escapeHTML(ratingLabel)+'"><span aria-hidden="true">'+stars+'</span><small>'+escapeHTML(has?rating.toFixed(1)+' ('+count+')':(en?'No reviews yet':'لا توجد تقييمات بعد'))+'</small></div>';
+   const image=photos.length?'<a class="merchant-card-image-link" href="'+href+'"><img class="merchant-card-image" loading="lazy" src="'+escapeHTML(photos[0])+'" alt="'+escapeHTML(title)+'"></a>':'';
+   const thumbs=photos.length>1?'<div class="merchant-card-thumbs" aria-label="'+(en?'Product photos':'صور المنتج')+'">'+photos.map((src,i)=>'<button type="button" data-card-photo="'+escapeHTML(src)+'" aria-pressed="'+String(i===0)+'" aria-label="'+(en?'View photo ':'عرض الصورة ')+(i+1)+'"><img class="merchant-card-thumb" loading="lazy" src="'+escapeHTML(src)+'" alt=""></button>').join('')+'</div>':'';
+   return '<article class="merchant-card">'+image+thumbs+'<a class="merchant-card-copy" href="'+href+'"><small>'+escapeHTML(store)+'</small><h3>'+escapeHTML(title)+'</h3>'+ratingHtml+'<strong>'+escapeHTML(price)+'</strong><span class="merchant-card-action">'+(en?'View details':'عرض التفاصيل')+' ↗</span></a></article>';
+  }).join('')+'</div>':'<p class="merchant-empty">'+(en?'No products found.':'لا توجد منتجات متاحة لهذا البحث.')+'</p>';
  }catch{if(mount.isConnected)mount.textContent=en?'Products could not be loaded. Please try again.':'تعذّر تحميل المنتجات. حاول مرة أخرى.'}
 }
 async function loadMarketStores(params){
