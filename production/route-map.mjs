@@ -11,6 +11,7 @@ export function fromLegacy(fragment) {
  if(name==='info'&&params.get('slug')){const slug=params.get('slug');path=slug==='how-to-buy'?'/how-to-buy':'/guides/'+encodeURIComponent(slug);params.delete('slug');}
  if(name==='owner'&&params.get('topic')){path='/business/'+encodeURIComponent(params.get('topic'));params.delete('topic');}
  if(name==='policy'&&params.get('slug')){path='/policies/'+encodeURIComponent(params.get('slug'));params.delete('slug');}
+ if((name==='public-store'||name==='public-product')&&/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(params.get('slug')||'')){path=(name==='public-store'?'/stores/':'/product/')+encodeURIComponent(params.get('slug'));params.delete('slug');}
  if(name==='results')path='/search';
  if(name==='detail')path='/listing';
  if(name==='store')path='/store';
@@ -26,6 +27,7 @@ export function toLegacy(pathname,search='') {
  if(path==='/experiences/design'){name='vision';params.set('area','studio');}
  let match=path.match(/^\/(categories|guides|business|policies)\/([^/]+)$/);
  if(match){name={categories:'section',guides:'info',business:'owner',policies:'policy'}[match[1]];try{params.set({categories:'category',guides:'slug',business:'topic',policies:'slug'}[match[1]],decodeURIComponent(match[2]));}catch{return null;}}
+ const merchant=path.match(/^\/(stores|product)\/([A-Za-z0-9][A-Za-z0-9_-]{0,159})$/);if(merchant){name=merchant[1]==='stores'?'public-store':'public-product';params.set('slug',merchant[2]);}
  if(path==='/search')name='results';
  if(path==='/listing')name='detail';
  if(path==='/store')name='store';

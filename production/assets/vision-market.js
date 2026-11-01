@@ -174,7 +174,7 @@ function render(){
  try{
   global();
   const root=document.querySelector('#content');if(!root)return;
-  const route=(window.marketLocation.hash.slice(1)||'home').split('?')[0];let html=null;
+  const route=(window.marketLocation.hash.slice(1)||'home').split('?')[0];if(['public-store','public-product'].includes(route))return;let html=null;
   if(route==='home')html=home();
   else if(route==='vision')html=vision(new URLSearchParams(window.marketLocation.hash.split('?')[1]||'').get('area')||'studio');
   else if(route==='partners')html=partners();

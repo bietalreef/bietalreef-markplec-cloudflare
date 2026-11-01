@@ -1,7 +1,10 @@
 
 /* Biet Al Reef Studio v4 — original procedural 3D furniture. Three.js MIT (threejs.org). */
 import * as T from '/three.module.min.js';
-const ID='brx-studio',KEY='brx-studio-uae-v4';
+const ID='brx-studio',GENERAL_KEY='brx-studio-uae-v4';
+let KEY=GENERAL_KEY,merchant=null;
+const lang=(ar,en)=>merchant&&document.documentElement.lang.startsWith('en')?en:ar;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS={
  wall:['#e8dcc9','#f5f2e9','#c2ad95','#a6aaa0','#ead6c4','#dde1d5'],
  floor:['#bf9b70','#e3c9a4','#94755b','#bfc0b9','#73594b'],
@@ -9,7 +12,7 @@ const COLORS={
  wood:['#98714a','#c09b6e','#5a4130','#d3b58c'],
  metal:['#bd995d','#484a45','#ded8c9']
 };
-const ITEMS=[
+const GENERAL_ITEMS=[
 {id:'sofa',ar:'أريكة الريف المعيارية',cat:'جلوس',dim:'240 × 94 × 82 سم',icon:'▰',foot:2.3,desc:'أريكة قابلة لتغيير القماش والتدوير بحرية'},
 {id:'chair',ar:'كرسي واحة للاسترخاء',cat:'جلوس',dim:'86 × 80 × 92 سم',icon:'◫',foot:.85,desc:'كرسي بخامات خشبية ومقعد مريح'},
 {id:'coffee',ar:'طاولة سُدرة الدائرية',cat:'طاولات',dim:'105 × 105 × 44 سم',icon:'◉',foot:1,desc:'طاولة مركزية بتشطيب خشبي فاخر'},
@@ -19,6 +22,7 @@ const ITEMS=[
 {id:'console',ar:'كونسول جذور',cat:'تخزين',dim:'160 × 42 × 80 سم',icon:'▥',foot:1.6,desc:'وحدة تخزين بخطوط بسيطة وخامات خشبية'},
 {id:'ottoman',ar:'مقعد وثير',cat:'جلوس',dim:'70 × 70 × 44 سم',icon:'◈',foot:.7,desc:'مقعد إضافي يدعم تنويع الجلسة'}
 ];
+let ITEMS=GENERAL_ITEMS;
 const DEFAULT=[
  {uid:'g1',type:'rug',x:0,z:.72,rot:0,scale:1},
  {uid:'g2',type:'sofa',x:0,z:-.98,rot:0,scale:1},
@@ -28,8 +32,15 @@ const DEFAULT=[
  {uid:'g6',type:'plant',x:2.65,z:-1.65,rot:0,scale:1}
 ];
 const clone=a=>JSON.parse(JSON.stringify(a));
-let state={items:clone(DEFAULT),chosen:'g2',wall:COLORS.wall[0],floor:COLORS.floor[0],fabric:COLORS.fabric[0],wood:COLORS.wood[0],metal:COLORS.metal[0]};
-try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.items)&&s.items.length<=35&&s.items.every(x=>ITEMS.some(i=>i.id===x.type))){state={...state,...s,items:s.items.map(x=>({...x,x:Math.max(-3,Math.min(3,Number(x.x)||0)),z:Math.max(-2.3,Math.min(2.8,Number(x.z)||0)),scale:Math.max(.55,Math.min(1.7,Number(x.scale)||1))}))}}}catch{}
+let state;
+function configureContext(config){
+ merchant=config;KEY=config?'brx-studio-merchant-'+config.slug:GENERAL_KEY;
+ ITEMS=config?config.items.map(x=>({...x,ar:String(x.ar||''),en:String(x.en||''),cat:lang('منتجات المتجر','Store products'),dim:lang('مجسم تقريبي','Illustrative model'),icon:'▧'})):GENERAL_ITEMS;
+ const featured=config?.items.find(i=>i.model==='wooden-kitchen')||config?.items[0];
+ const initial=config?(featured?[{uid:'merchant-featured',type:featured.id,x:-1.2,z:-1.55,rot:0,scale:1}]:[]):clone(DEFAULT);
+ state={items:initial,chosen:config?(featured?'merchant-featured':null):'g2',wall:COLORS.wall[0],floor:COLORS.floor[0],fabric:COLORS.fabric[0],wood:COLORS.wood[0],metal:COLORS.metal[0]};past=[];future=[];
+ try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.items)&&s.items.length<=35&&s.items.every(x=>ITEMS.some(i=>i.id===x.type))){state={...state,...s,items:s.items.map(x=>({...x,x:Math.max(-3,Math.min(3,Number(x.x)||0)),z:Math.max(-2.3,Math.min(2.8,Number(x.z)||0)),scale:Math.max(.55,Math.min(1.7,Number(x.scale)||1))}))}}}catch{}
+}
 let past=[],future=[],renderer=null,scene=null,camera=null,room=null,furniture=null,objects=new Map(),raf=0,resize=null,running=false;
 let yaw=.49,pitch=.42,radius=9.1,drag=null,material={};
 const hex=s=>new T.Color(s);
@@ -40,6 +51,7 @@ function box(group,x,y,z,w,h,d,m,cast=true){const mesh=new T.Mesh(new T.BoxGeome
 function cyl(g,x,y,z,rt,rb,h,m,n=24){let q=new T.Mesh(new T.CylinderGeometry(rt,rb,h,n),m);q.position.set(x,y,z);q.castShadow=true;q.receiveShadow=true;g.add(q);return q}
 function ball(g,x,y,z,rx,ry,rz,m){const q=new T.Mesh(new T.SphereGeometry(1,18,12),m);q.scale.set(rx,ry,rz);q.position.set(x,y,z);q.castShadow=true;g.add(q);return q}
 function model(type){
+ type=ITEMS.find(x=>x.id===type)?.model||type;
  const g=new T.Group(),f=material.fabric,w=material.wood,mt=material.metal,iv=material.ivory,green=material.green;
  if(type==='sofa'){
   box(g,0,.37,0,2.44,.34,.91,f);
@@ -74,6 +86,18 @@ function model(type){
   box(g,0,.44,0,1.6,.8,.43,w);box(g,0,.87,0,1.69,.07,.49,mt);
   for(let x of [-.49,0,.49])box(g,x,.47,.226,.005,.65,.008,iv,false);
   for(let x of [-.75,.75])cyl(g,x,.04,.0,.023,.023,.09,mt,12)
+ }else if(type==='wooden-kitchen'){
+  box(g,0,.48,0,2.4,.86,.62,w);box(g,0,.93,.02,2.48,.07,.67,iv);
+  for(let x of [-.79,0,.79]){box(g,x,.50,.321,.75,.73,.022,iv);box(g,x+.27,.57,.338,.018,.13,.018,mt)}
+  box(g,0,2.05,-.15,2.4,.78,.32,w);for(let x of [-.79,0,.79]){box(g,x,2.05,.02,.75,.69,.02,iv);box(g,x+.27,1.95,.035,.018,.12,.018,mt)}
+ }else if(type==='wooden-wardrobe'){
+  box(g,0,1.12,0,1.65,2.24,.62,w);
+  for(let x of [-.54,0,.54]){box(g,x,1.14,.322,.51,2.06,.025,iv);box(g,x+.18,1.09,.345,.018,.29,.025,mt)}
+  box(g,0,2.26,0,1.70,.05,.67,w);
+ }else if(type==='wooden-door'){
+  box(g,0,1.1,0,1.02,2.2,.15,w);box(g,0,1.1,.09,.88,2.05,.065,iv);
+  for(let y of [.48,1.10,1.72])box(g,0,y,.13,.67,.025,.012,w,false);
+  cyl(g,.30,1.03,.15,.035,.035,.055,mt,16).rotation.x=Math.PI/2;
  }else if(type==='ottoman'){
   cyl(g,0,.25,0,.36,.33,.38,f,30);cyl(g,0,.45,0,.37,.37,.1,iv,30);
  }
@@ -162,6 +186,15 @@ function movePointer(e){
 }
 function endPointer(e){if(!drag||drag.pointer!==e.pointerId)return;if(drag.moved&&drag.id){past.push(drag.before);future=[];save();refreshSummary()}drag=null}
 const moneyPlaceholder='<span class="brx-price">السعر عند الطلب</span>';
+function renderMerchantApp(root){
+ const tr=lang;
+ root.innerHTML='<div class="brx-studio brx-merchant" id="'+ID+'"><header class="brx-intro"><div><small>BIET AL REEF / DESIGN STUDIO</small><h2>'+tr('صمّم مساحتك مع المتجر','Design your space with this store')+'</h2><p>'+tr('اختر منتجًا وحرّكه وجرّب الألوان داخل مساحتك.','Choose a product, move it and try colours in your space.')+'</p></div><div class="brx-head-actions"><button type="button" data-brx="undo" id="brx-undo">↶ '+tr('تراجع','Undo')+'</button><button type="button" data-brx="redo" id="brx-redo">↷ '+tr('إعادة','Redo')+'</button><button type="button" class="brx-primary" data-brx="save">'+tr('حفظ التصميم','Save design')+'</button></div></header>'+
+ '<section class="brx-layout"><aside class="brx-library"><header><small>'+tr('منتجات المتجر','STORE PRODUCTS')+'</small><h2>'+tr('اختر قطعة','Choose a piece')+'</h2></header><div class="brx-searchline"><input id="brx-search" placeholder="'+tr('ابحث عن منتج...','Search products...')+'" aria-label="'+tr('ابحث عن منتج','Search products')+'" autocomplete="off"></div><div id="brx-list" class="brx-item-list">'+listItems()+'</div><p class="brx-library-note">'+tr('مجسمات تقريبية للتصوّر؛ تفاصيل المنتج والمقاسات النهائية لدى المتجر.','Illustrative models; confirm product details and final dimensions with the store.')+'</p></aside>'+
+ '<div class="brx-workspace"><div class="brx-workbar"><div><strong>'+tr('مساحتك','Your space')+'</strong><small>'+tr('معاينة ثلاثية الأبعاد','Interactive 3D preview')+'</small></div><div class="brx-workbuttons"><button data-brx="reset-camera">'+tr('ضبط المشهد','Reset view')+'</button><button data-brx="capture">'+tr('حفظ صورة','Save image')+'</button></div></div><div id="brx-viewport" class="brx-viewport"><div class="brx-watermark">'+tr('بيت الريف • تصميم تفاعلي','Biet Al Reef • Interactive design')+'</div><p id="brx-error" hidden>'+tr('تعذّر تشغيل العرض ثلاثي الأبعاد في هذا المتصفح.','3D preview is unavailable in this browser.')+'</p><div class="brx-canvas-tip">'+tr('اسحب القطع لتحريكها • اسحب الخلفية لتدوير المشهد','Drag a piece to move it • Drag the background to rotate')+'</div></div><div class="brx-footer-tools"><div><span>3D</span><span>'+tr('تدوير القطعة','Rotate pieces')+'</span><span>'+tr('ألوان قابلة للتغيير','Custom colours')+'</span></div><small>'+tr('مجسمات تقريبية للتصوّر','Illustrative 3D models')+'</small></div></div>'+
+ '<aside class="brx-properties"><header><small>'+tr('تخصيص التصميم','CUSTOMISE')+'</small><h2>'+tr('الألوان والخامات','Colours and materials')+'</h2></header><div id="brx-selected"></div><div class="brx-swatches" id="brx-palettes">'+palettes()+'</div><div class="brx-summary"><strong>'+tr('محتويات المشهد','In your space')+'</strong><div><span id="brx-qty"></span></div><button data-brx="export" class="brx-save-list">'+tr('تنزيل قائمة العناصر','Download item list')+'</button><button data-brx="clear" class="brx-clear">'+tr('إفراغ المساحة','Clear space')+'</button></div></aside></section>'+
+ ((merchant.whatsapp||merchant.appUrl)?'<section class="brx-quote"><div><small>'+tr('تفصيل على مقاسك','MADE FOR YOUR SPACE')+'</small><h2>'+tr('اطلب عرض سعر لتصميمك','Request a quote for your design')+'</h2><p>'+tr('أخبر المتجر بما تحتاجه، وأضف المقاسات المتوفرة لديك.','Tell the store what you need and share any dimensions you have.')+'</p></div>'+(merchant.whatsapp?'<form id="brx-quote-form"><p class="brx-quote-selection" id="brx-quote-selection"></p><label>'+tr('تفاصيل الطلب','What would you like made?')+'<textarea name="details" minlength="10" maxlength="1200" required placeholder="'+tr('الخامة، اللون، التقسيم الداخلي أو أي تفاصيل أخرى','Materials, colour, internal layout or other details')+'"></textarea></label><div class="brx-quote-fields"><label>'+tr('المقاسات المتوفرة (اختياري)','Available dimensions (optional)')+'<input name="dimensions" maxlength="200" placeholder="'+tr('العرض × الارتفاع × العمق','Width × height × depth')+'"></label><label>'+tr('المدينة أو المنطقة (اختياري)','City or area (optional)')+'<input name="area" maxlength="100" placeholder="'+tr('مثال: العين','For example: Al Ain')+'"></label></div><button type="submit" class="brx-quote-submit">'+tr('متابعة الطلب عبر واتساب','Continue via WhatsApp')+' ↗</button><p class="brx-quote-note">'+tr('ستفتح المحادثة لتراجع الرسالة وترسلها. يمكنك إرفاق صورة التصميم هناك.','Review and send the message in WhatsApp. You can attach your design image there.')+'</p></form>':'')+(merchant.appUrl?'<a class="brx-quote-app" href="'+esc(merchant.appUrl)+'" target="_blank" rel="noopener noreferrer">'+tr('افتح ملف المتجر داخل تطبيق بيت الريف','Open the store in the Biet Al Reef app')+' ↗</a>':'')+'</section>':'')+'</div>';
+ create3D();refreshInspector();refreshSummary();state.chosen&&refreshSelection();
+}
 function renderApp(){
  const root=document.getElementById('content');if(!root)return;
  root.innerHTML='<main class="brx-studio wrap" id="'+ID+'"><div class="brx-crumb"><a href="#home">الرئيسية</a><span>›</span><strong>استوديو بيت الريف</strong></div>'+
@@ -174,32 +207,34 @@ function renderApp(){
  create3D();refreshInspector();refreshSummary();state.chosen&&refreshSelection();
 }
 function listItems(filter='الكل',query=''){
+ if(merchant){const q=query.toLocaleLowerCase();return ITEMS.filter(i=>!q||[i.ar,i.en].some(x=>x.toLocaleLowerCase().includes(q))).map(i=>'<article class="brx-product"><div class="brx-model-thumb">'+(i.image?'<img loading="lazy" src="'+esc(i.image)+'" alt="">':'')+'</div><div class="brx-product-text"><small>'+lang('مجسم تقريبي','Illustrative model')+'</small><strong>'+esc(lang(i.ar,i.en))+'</strong><a href="'+esc(i.href)+'">'+lang('تفاصيل المنتج','Product details')+' ↗</a><button type="button" data-brx-add="'+esc(i.id)+'">+ '+lang('إضافة للمساحة','Add to space')+'</button></div></article>').join('')||'<p class="brx-empty">'+lang('لا توجد نتائج.','No results.')+'</p>'}
  const items=ITEMS.filter(it=>(filter==='الكل'||it.cat===filter)&&(!query||it.ar.includes(query)||it.cat.includes(query)));
  return items.map(i=>'<article class="brx-product"><div class="brx-model-thumb" data-brx-thumb="'+i.id+'" aria-hidden="true">'+(brxThumbnailCache[i.id]?'<img alt="" loading="lazy" src="'+brxThumbnailCache[i.id]+'">':'')+'</div><div class="brx-product-text"><small>'+i.cat+' · '+i.dim+'</small><strong>'+i.ar+'</strong>'+moneyPlaceholder+'<button type="button" data-brx-add="'+i.id+'">+ إضافة للمساحة</button></div></article>').join('')||'<p class="brx-empty">لا توجد نتائج.</p>';
 }
 function palettes(){
- return Object.entries({fabric:'قماش الأثاث',wall:'دهان الجدران',floor:'ألوان الأرضية',wood:'الأخشاب',metal:'اللمسات المعدنية'}).map(([key,label])=>'<div class="brx-palette"><label>'+label+'</label><div>'+COLORS[key].map(color=>'<button class="brx-swatch'+(state[key]===color?' active':'')+'" style="background:'+color+'" data-brx-color="'+key+'" data-hex="'+color+'" aria-label="'+label+' '+color+'" title="'+color+'"></button>').join('')+'</div></div>').join('');
+ return Object.entries({fabric:lang('قماش الأثاث','Fabric'),wall:lang('دهان الجدران','Wall paint'),floor:lang('ألوان الأرضية','Floor'),wood:lang('الأخشاب','Wood'),metal:lang('اللمسات المعدنية','Metal')}).map(([key,label])=>'<div class="brx-palette"><label>'+label+'</label><div>'+COLORS[key].map(color=>'<button class="brx-swatch'+(state[key]===color?' active':'')+'" style="background:'+color+'" data-brx-color="'+key+'" data-hex="'+color+'" aria-label="'+label+' '+color+'" title="'+color+'"></button>').join('')+'</div></div>').join('');
 }
 function refreshInspector(){
  const item=state.items.find(x=>x.uid===state.chosen),it=ITEMS.find(x=>x.id===item?.type),el=document.querySelector('#brx-selected');if(!el)return;
+ if(merchant){el.innerHTML=it?'<div class="brx-chosen"><span>'+esc(it.icon)+'</span><div><small>'+lang('القطعة المحددة','Selected item')+'</small><strong>'+esc(lang(it.ar,it.en))+'</strong><small>'+lang('مجسم تقريبي','Illustrative model')+'</small></div></div><div class="brx-ops"><label>'+lang('تدوير القطعة','Rotate item')+'</label><div><button data-brx="rotleft">↶ 15°</button><button data-brx="rotright">↷ 15°</button></div><label>'+lang('حجم القطعة','Item size')+'</label><div><button data-brx="smaller">− '+lang('تصغير','Smaller')+'</button><button data-brx="bigger">+ '+lang('تكبير','Larger')+'</button></div><div><button data-brx="duplicate">'+lang('نسخ','Duplicate')+'</button><button class="brx-danger" data-brx="delete">'+lang('حذف','Remove')+'</button></div></div>':'<div class="brx-selecthint">'+lang('اضغط على قطعة لتعديلها.','Select a piece to edit it.')+'</div>';return}
  el.innerHTML=it?'<div class="brx-chosen"><span>'+it.icon+'</span><div><small>القطعة المحددة</small><strong>'+it.ar+'</strong><small>'+it.dim+'</small></div></div><div class="brx-ops"><label>دوران ثلاثي الأبعاد</label><div><button data-brx="rotleft">↶ 15°</button><button data-brx="rotright">↷ 15°</button></div><label>حجم القطعة</label><div><button data-brx="smaller">− تصغير</button><button data-brx="bigger">+ تكبير</button></div><div><button data-brx="duplicate">نسخ</button><button class="brx-danger" data-brx="delete">حذف</button></div></div>':'<div class="brx-selecthint">اضغط على قطعة داخل الغرفة لتدويرها وتغيير حجمها وتفاصيلها.</div>';
 }
-function refreshSummary(){let e=document.querySelector('#brx-qty');if(e)e.textContent=state.items.length+' قطع';for(const cmd of ['undo','redo']){let b=document.querySelector('#brx-'+cmd);if(b)b.disabled=cmd==='undo'?!past.length:!future.length}}
+function refreshSummary(){let e=document.querySelector('#brx-qty');if(e)e.textContent=state.items.length+' '+lang('قطع','items');const q=document.querySelector('#brx-quote-selection');if(q){const names=[...new Set(state.items.map(x=>ITEMS.find(i=>i.id===x.type)).filter(Boolean).map(i=>lang(i.ar,i.en)))];q.textContent=names.length?lang('قطع التصميم: ','Design items: ')+names.join('، '):lang('أضف قطعة إلى التصميم، أو صف ما تحتاجه مباشرة.','Add pieces to the design, or describe what you need.')}for(const cmd of ['undo','redo']){let b=document.querySelector('#brx-'+cmd);if(b)b.disabled=cmd==='undo'?!past.length:!future.length}}
 function refreshSelection(){if(!objects.size)return;for(const [id,obj] of objects){obj.traverse(c=>{if(c.isMesh)c.userData.selected=id===state.chosen})}}
 function mutate(fn){push();fn();save();refreshInspector();refreshSummary();rebuild();refreshSelection();refreshPalettes();setTimeout(renderThumbnails,120)}
 function refreshPalettes(){const el=document.querySelector('#brx-palettes');if(el)el.innerHTML=palettes()}
 let uidseq=0;
 function handleClick(e){
  const color=e.target.closest('[data-brx-color]');if(color){mutate(()=>{state[color.dataset.brxColor]=color.dataset.hex});return}
- const add=e.target.closest('[data-brx-add]');if(add){if(state.items.length>=30)return;mutate(()=>{let id='b'+Date.now()+'-'+(++uidseq);state.items.push({uid:id,type:add.dataset.brxAdd,x:(Math.random()-.5)*2,z:(Math.random()-.5)*2,rot:0,scale:1});state.chosen=id});return}
+ const add=e.target.closest('[data-brx-add]');if(add){if(state.items.length>=30||!ITEMS.some(i=>i.id===add.dataset.brxAdd))return;mutate(()=>{let id='b'+Date.now()+'-'+(++uidseq);state.items.push({uid:id,type:add.dataset.brxAdd,x:(Math.random()-.5)*2,z:(Math.random()-.5)*2,rot:0,scale:1});state.chosen=id});return}
  const btn=e.target.closest('[data-brx]');if(btn){
  const action=btn.dataset.brx,selected=state.items.find(x=>x.uid===state.chosen);
- if(action==='save'){save();btn.textContent='تم حفظ التصميم ✓';return}
+ if(action==='save'){save();btn.textContent=lang('تم حفظ التصميم ✓','Design saved ✓');return}
  if(action==='undo'){if(!past.length)return;future.push(JSON.stringify(state));state=JSON.parse(past.pop());save();rebuild();refreshInspector();refreshSummary();refreshPalettes();return}
  if(action==='redo'){if(!future.length)return;past.push(JSON.stringify(state));state=JSON.parse(future.pop());save();rebuild();refreshInspector();refreshSummary();refreshPalettes();return}
  if(action==='reset-camera'){yaw=.49;pitch=.42;radius=9.1;cameraUpdate();return}
  if(action==='capture'){try{const a=document.createElement('a');a.download='biet-alreef-studio.png';a.href=renderer.domElement.toDataURL('image/png');a.click()}catch{}return}
- if(action==='export'){const rows=['القطعة,النوع,المقاسات,الحالة',...state.items.map(x=>{let v=ITEMS.find(i=>i.id===x.type);return [v.ar,v.cat,v.dim,'للتصميم فقط - السعر عند الطلب'].join(',')})];let a=document.createElement('a'),blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});a.href=URL.createObjectURL(blob);a.download='biet-alreef-design-items.csv';a.click();URL.revokeObjectURL(a.href);return}
+ if(action==='export'){const csv=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const rows=[[lang('القطعة','Item'),lang('الحالة','Representation')],...state.items.map(x=>{let v=ITEMS.find(i=>i.id===x.type);return [lang(v?.ar||'',v?.en||''),lang('مجسم تقريبي للتصميم','Illustrative design model')]})].map(row=>row.map(csv).join(','));let a=document.createElement('a'),blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});a.href=URL.createObjectURL(blob);a.download='biet-alreef-design-items.csv';a.click();URL.revokeObjectURL(a.href);return}
  if(action==='clear'){mutate(()=>{state.items=[];state.chosen=null});return}
  if(!selected)return;
  mutate(()=>{if(action==='rotleft')selected.rot-=Math.PI/12;if(action==='rotright')selected.rot+=Math.PI/12;if(action==='smaller')selected.scale=Math.max(.55,selected.scale-.1);if(action==='bigger')selected.scale=Math.min(1.7,selected.scale+.1);if(action==='delete'){state.items=state.items.filter(x=>x.uid!==selected.uid);state.chosen=null}if(action==='duplicate'&&state.items.length<30){let u='b'+Date.now()+'-'+(++uidseq);state.items.push({...selected,uid:u,x:Math.min(3,selected.x+.3)});state.chosen=u}});
@@ -215,7 +250,7 @@ function destroy(){
 
 let brxThumbnailCache={};
 function renderThumbnails(){
- if(!renderer||!scene)return;
+ if(merchant||!renderer||!scene)return;
  const W=144,H=144,target=new T.WebGLRenderTarget(W,H,{format:T.RGBAFormat,type:T.UnsignedByteType});
  const oldTarget=renderer.getRenderTarget(),oldClear=new T.Color();renderer.getClearColor(oldClear);const oldAlpha=renderer.getClearAlpha();
  const thumbScene=new T.Scene();thumbScene.background=null;
@@ -239,12 +274,33 @@ function renderThumbnails(){
 }
 
 function route(){const active=window.marketLocation.hash.split('?')[0]==='#studio';const root=document.querySelector('#content');if(!root)return;
+ const pane=root.querySelector('[data-merchant-panel="design"]'),target=pane?.querySelector('[data-merchant-studio-mount]');
+ if(pane&&target&&!pane.hidden){
+  if(!target.querySelector('#'+ID)){
+   let config;try{config=JSON.parse(pane.querySelector('#brx-merchant-data')?.textContent||'null')}catch{}
+   if(!config||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(config.slug||'')||!Array.isArray(config.items))return;
+   if(!/^\d{9,15}$/.test(config.whatsapp||''))config.whatsapp='';
+   if(!/^https:\/\/providers\.bietalreef\.ae\/provider\/BR-[0-9]{7,12}$/.test(config.appUrl||''))config.appUrl='';
+   config.items=config.items.filter(i=>/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(i.id||'')&&['wooden-kitchen','wooden-wardrobe','wooden-door'].includes(i.model)&&/^\/(?:en\/)?product\/[A-Za-z0-9_-]+$/.test(i.href||'')&&(!i.image||i.image.startsWith('/')&&!i.image.startsWith('//')||/^https:\/\//.test(i.image)));
+   if(!config.items.length)return;if(renderer)destroy();configureContext(config);renderMerchantApp(target);
+  }else if(!renderer){create3D();refreshInspector();refreshSummary()}
+  return;
+ }
  if(!active){if(renderer)destroy();return}
- if(!root.querySelector('#'+ID))renderApp();
+ if(!root.querySelector('#'+ID)){if(renderer)destroy();configureContext(null);renderApp()}
 }
 document.addEventListener('click',handleClick);
+document.addEventListener('submit',e=>{
+ if(e.target.id!=='brx-quote-form'||!merchant||!/^\d{9,15}$/.test(merchant.whatsapp))return;
+ e.preventDefault();const form=e.target,fields=new FormData(form),details=String(fields.get('details')||'').trim();if(details.length<10){form.reportValidity();return}
+ const counts=new Map();for(const x of state.items)counts.set(x.type,(counts.get(x.type)||0)+1);
+ const selected=[...counts].map(([id,n])=>{const item=ITEMS.find(i=>i.id===id);return item?'- '+lang(item.ar,item.en)+' × '+n+'\nhttps://app.bietalreef.ae'+item.href:''}).filter(Boolean);
+ const message=[lang('مرحبًا، أود طلب عرض سعر من ','Hello, I would like a quote from ')+merchant.name,selected.length?lang('قطع التصميم:','Design items:')+'\n'+selected.join('\n'):'',lang('التفاصيل: ','Details: ')+details,String(fields.get('dimensions')||'').trim()?lang('المقاسات المتوفرة: ','Available dimensions: ')+String(fields.get('dimensions')).trim():'',String(fields.get('area')||'').trim()?lang('الموقع: ','Location: ')+String(fields.get('area')).trim():'',lang('المجسمات تقريبية للتصوّر فقط.','The 3D models are illustrative.')].filter(Boolean).join('\n\n');
+ const a=document.createElement('a');a.href='https://wa.me/'+merchant.whatsapp+'?text='+encodeURIComponent(message);a.target='_blank';a.rel='noopener noreferrer';a.click();
+});
 document.addEventListener('input',e=>{if(e.target.id==='brx-search'){const category=document.querySelector('[data-brx-cat].active')?.dataset.brxCat||'الكل';document.querySelector('#brx-list').innerHTML=listItems(category,e.target.value.trim())}});
 window.addEventListener('hashchange',()=>requestAnimationFrame(route));
+document.addEventListener('brx-merchant-tab',()=>requestAnimationFrame(route));
 const mount=document.querySelector('#content');if(mount)new MutationObserver(()=>{if(window.marketLocation.hash.split('?')[0]==='#studio'&&!document.querySelector('#'+ID))queueMicrotask(route)}).observe(mount,{childList:true});
 route();
 

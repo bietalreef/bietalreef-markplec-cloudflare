@@ -2,7 +2,7 @@ from pathlib import Path
 import json, hashlib, base64
 base=Path(__file__).parent
 s=(base/'worker-baseline.mjs').read_text();start=s.index('{');assets,end=json.JSONDecoder().raw_decode(s[start:])
-for name in ['index.html','route-bridge.js','vision-market.js','app.js','market-experience.js','market-v3.js','market-v3.css','brx-studio.js','brx-premium.js','experience-pages.css']:
+for name in ['index.html','route-bridge.js','vision-market.js','app.js','market-experience.js','market-v3.js','market-v3.css','brx-studio.js','brx-premium.js','experience-pages.css','merchant-pages.css','merchant-pages.js']:
  assets[name]=(base/'assets'/name).read_text()
 experience_renderer=(base/'experience-render.mjs').read_text()
 assets['experience-render.js']=experience_renderer
@@ -13,11 +13,13 @@ for path in (base/'media'/'experiences').iterdir():
  if path.suffix in ('.webp','.mp4'):
   assets['xp/'+path.name]=base64.b64encode(path.read_bytes()).decode()
 # Fingerprint changed modules so a browser cannot combine new HTML with old routing code.
-for name in ['route-bridge.js','vision-market.js','app.js','market-experience.js','market-v3.js','brx-studio.js','brx-premium.js']:
+for name in ['route-bridge.js','vision-market.js','app.js','market-experience.js','market-v3.js','brx-studio.js','brx-premium.js','merchant-pages.js']:
  version=hashlib.sha256(assets[name].encode()).hexdigest()[:12]
  assets['index.html']=assets['index.html'].replace('src=\"/'+name+'\"','src=\"/'+name+'?v='+version+'\"')
 version=hashlib.sha256(assets['experience-pages.css'].encode()).hexdigest()[:12]
 assets['index.html']=assets['index.html'].replace('href="/experience-pages.css"','href="/experience-pages.css?v='+version+'"')
+version=hashlib.sha256(assets['merchant-pages.css'].encode()).hexdigest()[:12]
+assets['index.html']=assets['index.html'].replace('href="/merchant-pages.css"','href="/merchant-pages.css?v='+version+'"')
 s=s[:start]+json.dumps(assets,ensure_ascii=False,separators=(',',':'))+s[start+end:]
 needle="if(url.pathname==='/favicon.ico'"
 assert needle in s
@@ -88,7 +90,7 @@ if(liveHost && url.pathname==='/en/') {
 routecode=(base/'route-map.mjs').read_text().replace('export function ','function ')
 documents=(base/'documents.json').read_text()
 helpers="const BR_CSP=\"default-src 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; form-action 'self'\";\n"+routecode+'\nconst BR_DOCS='+documents+';\n'+"const BR_PUBLIC_PATHS=['/','/studio','/categories',...['furniture','decor','kitchen','maintenance','garden','construction'].map(x=>'/categories/'+x),'/experiences/design','/experiences/stores','/experiences/contracting-services','/experiences/partnerships','/how-to-buy','/how-it-works','/sitemap',...Object.keys(BR_DOCS.infoDocuments).filter(x=>x!=='how-to-buy').map(x=>'/guides/'+x),...Object.keys(BR_DOCS.ownerTopics).map(x=>'/business/'+x),...Object.keys(BR_DOCS.legalDocuments).map(x=>'/policies/'+x),'/google-workspace-offer'];\n"+"function BR_REWRITE_LINKS(html,en){return html.replace(/href=\"(#[^\"]+)\"/g,(full,h)=>{let target=fromLegacy(h.replace(/&amp;/g,'&'));if(!target)return full;let path=(en?(target==='/'?'/en/':'/en'+target):target).replace(/&/g,'&amp;');return 'href=\"'+path+'\" data-market-legacy=\"'+h+'\"'});}\n"
-helpers+=(base/'experience-source.mjs').read_text()+'\n'+experience_renderer.replace('export function ','function ')+'\n'+(base/'experience-seo.mjs').read_text()+'\n'
+helpers+=(base/'experience-source.mjs').read_text()+'\n'+experience_renderer.replace('export function ','function ')+'\n'+(base/'experience-seo.mjs').read_text()+'\n'+(base/'merchant-render.mjs').read_text()+'\n'
 helpers+="function BR_HOME_HTML(pages,en){const fallback={studio:{slug:'design',ar:{title:'مستقبل التصميم'},en:{title:'The Future of Design'}},showroom:{slug:'stores',ar:{title:'مستقبل المتاجر'},en:{title:'The Future of Stores'}},projects:{slug:'contracting-services',ar:{title:'مستقبل المقاولات والخدمات'},en:{title:'The Future of Contracting and Services'}},partner:{slug:'partnerships',ar:{title:'مستقبل الشراكة'},en:{title:'The Future of Partnership'}}};const links=Object.values(pages||fallback).map(p=>'<a href=\"'+(en?'/en':'')+'/experiences/'+p.slug+'\">'+BR_ESC(p[en?'en':'ar'].title)+'</a> ').join('');return '<div class=\"wrap\"><h1>'+(en?'Biet Al Reef Marketplace: stores and interactive showrooms':'سوق بيت الريف: المتاجر والمعارض التفاعلية')+'</h1><p>'+(en?'Discover design, stores, services and partnerships in the UAE.':'اكتشف التصميم والمتاجر والخدمات وفرص الشراكة في الإمارات.')+'</p><nav>'+links+'</nav></div>';}\n"
 s=s.replace("const MIME={",helpers+"const MIME={",1);
 s=s.replace("const MIME={","const BR_ESC=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c]));\nconst MIME={",1);
@@ -102,6 +104,6 @@ s=s[:old_start]+sitemap+s[old_end:]
 s=s.replace("let body=ASSETS[path];","let body=ASSETS[path]; if(liveHost&&path==='index.html'){const pages=await BR_LOAD_EXPERIENCES();body=body.replace('<main id=\"content\" tabindex=\"-1\"></main>','<main id=\"content\" tabindex=\"-1\">'+BR_HOME_HTML(pages,false)+'</main>');}",1)
 s=s.replace("+ '<link rel=\"canonical\" href=\"https://app.bietalreef.ae/\">\\n</head>'", "+ '<link rel=\"canonical\" href=\"https://app.bietalreef.ae/\"><link rel=\"alternate\" hreflang=\"ar-AE\" href=\"https://app.bietalreef.ae/\"><link rel=\"alternate\" hreflang=\"en-AE\" href=\"https://app.bietalreef.ae/en/\">\\n</head>'")
 
-s=s.replace(needle,english_home+inject+needle,1);
+s=s.replace(needle,english_home+(base/'merchant-worker-inject.mjs').read_text()+'\n'+inject+needle,1);
 s=s.replace("headers['Cache-Control']='public, max-age=300'", "headers['Cache-Control']='public, max-age=30'")
 s=s.replace("return new Response(request.method==='HEAD'?null:body,{status:200,headers});","return new Response(request.method==='HEAD'?null:(path==='index.html'?BR_REWRITE_LINKS(body.replace('<meta name=\"robots\" content=\"index,follow,max-image-preview:large\">',''),false):body),{status:200,headers});",1);(base/'dist').mkdir(exist_ok=True); (base/'dist/worker.mjs').write_text(s)

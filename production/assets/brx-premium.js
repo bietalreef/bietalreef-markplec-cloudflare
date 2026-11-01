@@ -1,6 +1,8 @@
 /* Biet Al Reef: UX premium mobile, cinematic 8s sequence */
 let brxActive='products',brxTerm='',brxScheduled=false;
 const brxTabs=[['products','▦','المنتجات'],['colors','◉','الألوان'],['items','↻','العناصر'],['scene','⌂','المشهد'],['save','▣','حفظ']];
+const brxEn=()=>!!document.querySelector('.brx-merchant')&&document.documentElement.lang.startsWith('en');
+const brxT=(ar,en)=>brxEn()?en:ar;
 function brxHome(){
  const root=document.querySelector('#content');if(!root||!['','#home','#categories'].includes(window.marketLocation.hash))return;
  const t=root.querySelector('.br-studio-teaser');
@@ -14,6 +16,13 @@ function brxHome(){
  }
 }
 function brxPane(kind){
+ if(document.querySelector('.brx-merchant')){
+  if(kind==='products')return '<header><small>'+brxT('منتجات المتجر','STORE PRODUCTS')+'</small><h3>'+brxT('أضف قطعة للمساحة','Add a piece')+'</h3></header><label class="brx-mobile-search">⌕ <input data-brx-mobile-search type="search" placeholder="'+brxT('ابحث عن منتج...','Search products...')+'" autocomplete="off"></label><div class="brx-mobile-products">'+(document.querySelector('#brx-list')?.innerHTML||'')+'</div>';
+  if(kind==='colors')return '<header><small>'+brxT('حرية التخصيص','CUSTOMISE')+'</small><h3>'+brxT('الألوان والخامات','Colours and materials')+'</h3></header><div class="brx-mobile-swatches">'+(document.querySelector('#brx-palettes')?.innerHTML||'')+'</div>';
+  if(kind==='items')return '<header><small>'+brxT('تعديل المجسم','EDIT')+'</small><h3>'+brxT('العنصر المحدد','Selected item')+'</h3></header><div class="brx-mobile-item">'+(document.querySelector('#brx-selected')?.innerHTML||brxT('اختر قطعة من الغرفة','Select a piece'))+'</div>';
+  if(kind==='scene')return '<header><h3>'+brxT('المشهد والكاميرا','Scene and camera')+'</h3></header><div class="brx-mobile-commands"><button data-brx-view="iso">'+brxT('منظور ثلاثي الأبعاد','3D view')+'</button><button data-brx-view="front">'+brxT('عرض أمامي','Front view')+'</button><button data-brx-view="top">'+brxT('مشهد علوي','Top view')+'</button><button data-brx="reset-camera">'+brxT('ضبط المشهد','Reset view')+'</button><button data-brx-zoom="in">'+brxT('تقريب +','Zoom in +')+'</button><button data-brx-zoom="out">'+brxT('إبعاد −','Zoom out −')+'</button></div>';
+  return '<header><h3>'+brxT('حفظ التصميم','Save design')+'</h3></header><div class="brx-mobile-commands"><button data-brx="save">'+brxT('حفظ على الجهاز','Save to device')+'</button><button data-brx="capture">'+brxT('تنزيل صورة','Download image')+'</button><button data-brx="export">'+brxT('قائمة القطع','Item list')+'</button><button data-brx="undo">'+brxT('تراجع','Undo')+'</button></div><p>'+brxT('يحفظ التصميم على جهازك.','Your design is saved on this device.')+'</p>';
+ }
  if(kind==='products')return '<header><small>مكتبة بيت الريف</small><h3>أضف قطعة للمساحة</h3></header><label class="brx-mobile-search">⌕ <input data-brx-mobile-search type="search" placeholder="ابحث عن قطعة..." autocomplete="off"></label><div class="brx-mobile-products">'+(document.querySelector('#brx-list')?.innerHTML||'')+'</div>';
  if(kind==='colors')return '<header><small>حرية التخصيص</small><h3>الألوان والخامات</h3></header><div class="brx-mobile-swatches">'+(document.querySelector('#brx-palettes')?.innerHTML||'')+'</div>';
  if(kind==='items')return '<header><small>تعديل المجسم</small><h3>العنصر المحدد</h3></header><div class="brx-mobile-item">'+(document.querySelector('#brx-selected')?.innerHTML||'اختر قطعة من الغرفة')+'</div>';
@@ -29,7 +38,7 @@ function brxMobileShow(kind,expand=true){
  bar.querySelectorAll('[data-brx-tab]').forEach(b=>b.setAttribute('aria-selected',String(expand&&b.dataset.brxTab===kind)));
  const panel=bar.querySelector('.brx-mobile-panel');panel.innerHTML=brxPane(kind);
  panel.setAttribute('aria-hidden',String(!expand));
- if(!panel.querySelector('[data-brx-panel-close]'))panel.insertAdjacentHTML('afterbegin','<button type="button" class="brx-panel-close" aria-label="إغلاق الأدوات" data-brx-panel-close>×</button>');
+ if(!panel.querySelector('[data-brx-panel-close]'))panel.insertAdjacentHTML('afterbegin','<button type="button" class="brx-panel-close" aria-label="'+brxT('إغلاق الأدوات','Close tools')+'" data-brx-panel-close>×</button>');
  if(kind==='products'&&brxTerm){const i=panel.querySelector('[data-brx-mobile-search]');if(i)i.value=brxTerm;brxFilter()}
 }
 function brxClosePanel(){
@@ -43,11 +52,12 @@ function brxFilter(){
 }
 function brxStudio(){
  const studio=document.querySelector('#brx-studio');if(!studio)return;
- const workspace=studio.querySelector('.brx-workspace');const bar=studio.querySelector('.brx-workbar');if(bar&&!bar.querySelector('.brx-quick-back'))bar.insertAdjacentHTML('afterbegin','<a class="brx-quick-back" href="#home" aria-label="العودة للسوق">← السوق</a><span class="brx-studio-mark"><img src="https://bietalreef.ae/icons/logo-512.webp" alt="" width="30" height="30"><strong>بيت الريف</strong><small>استوديو التصميم</small></span>');
+ const workspace=studio.querySelector('.brx-workspace');const bar=studio.querySelector('.brx-workbar');if(bar&&!bar.querySelector('.brx-quick-back')&&!studio.classList.contains('brx-merchant'))bar.insertAdjacentHTML('afterbegin','<a class="brx-quick-back" href="#home" aria-label="العودة للسوق">← السوق</a><span class="brx-studio-mark"><img src="https://bietalreef.ae/icons/logo-512.webp" alt="" width="30" height="30"><strong>بيت الريف</strong><small>استوديو التصميم</small></span>');
  if(workspace&&!workspace.querySelector('.brx-mobile-dock')){
-  const viewport=workspace.querySelector('.brx-viewport');if(viewport&&!viewport.querySelector('.brx-floating-camera'))viewport.insertAdjacentHTML('beforeend','<div class="brx-floating-camera" aria-label="زوايا العرض"><button type="button" data-brx-view="top" title="عرض علوي">⌗ <small>علوي</small></button><button type="button" data-brx-view="iso" title="عرض ثلاثي الأبعاد">◈ <small>3D</small></button><button type="button" data-brx-zoom="in" title="تقريب">＋</button><button type="button" data-brx-zoom="out" title="إبعاد">－</button></div>');
+  const viewport=workspace.querySelector('.brx-viewport');if(viewport&&!viewport.querySelector('.brx-floating-camera'))viewport.insertAdjacentHTML('beforeend','<div class="brx-floating-camera" aria-label="'+brxT('زوايا العرض','Camera views')+'"><button type="button" data-brx-view="top" title="'+brxT('عرض علوي','Top view')+'">⌗ <small>'+brxT('علوي','Top')+'</small></button><button type="button" data-brx-view="iso" title="'+brxT('عرض ثلاثي الأبعاد','3D view')+'">◈ <small>3D</small></button><button type="button" data-brx-zoom="in" title="'+brxT('تقريب','Zoom in')+'">＋</button><button type="button" data-brx-zoom="out" title="'+brxT('إبعاد','Zoom out')+'">－</button></div>');
   const el=document.createElement('div');el.className='brx-mobile-dock';
-  el.innerHTML='<div class="brx-mobile-tabs" role="tablist" aria-label="أدوات التصميم">'+brxTabs.map(t=>'<button type="button" role="tab" aria-selected="'+String(t[0]===brxActive)+'" data-brx-tab="'+t[0]+'"><span>'+t[1]+'</span><b>'+t[2]+'</b></button>').join('')+'</div><div class="brx-mobile-panel" role="tabpanel" aria-live="polite"></div>';
+  const names={products:'Products',colors:'Colours',items:'Items',scene:'Scene',save:'Save'};
+  el.innerHTML='<div class="brx-mobile-tabs" role="tablist" aria-label="'+brxT('أدوات التصميم','Design tools')+'">'+brxTabs.map(t=>'<button type="button" role="tab" aria-selected="'+String(t[0]===brxActive)+'" data-brx-tab="'+t[0]+'"><span>'+t[1]+'</span><b>'+brxT(t[2],names[t[0]])+'</b></button>').join('')+'</div><div class="brx-mobile-panel" role="tabpanel" aria-live="polite"></div>';
   workspace.querySelector('.brx-footer-tools')?.before(el);
   brxMobileShow(brxActive,false);
  }
