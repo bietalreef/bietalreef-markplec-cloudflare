@@ -166,3 +166,14 @@ test('ratings never treat a baseline as a customer review',async()=>{
  try{html=await (await response('/products/test-workshop/wooden-door')).text();assert.ok(html.includes('4.5 (3)'));assert.ok(html.includes('★★★★★'))}
  finally{productData.product.rating_source='baseline';productData.product.review_count=0;productData.product.rating_value=4}
 });
+
+test('Arkleen product pages show real public IDs, a sizing drawing and contact details',async()=>{
+ const p=productData.product,s=productData.store_profile,priorP={...p},priorS={...s};
+ Object.assign(p,{slug:'custom-wooden-door',sku:'SM-BR-PRD-2000001-003',specifications:{...(p.specifications||{}),merchant_market_code:'SM-2000001'}});
+ Object.assign(s,{slug:'arkleen',providerId:'SM-BR-2000001',phone:'+971500000000',publicEmail:'shop@example.com',website:'https://example.com'});
+ try{
+  const html=await (await response('/products/test-workshop/wooden-door')).text();
+  for(const value of ['SM-BR-2000001','SM-2000001','SM-BR-PRD-2000001-003','product-measurements','<svg viewBox="0 0 540 290"','رقم التاجر','رقم المنتج','tel:+971500000000','mailto:shop@example.com','/guides/returns-refunds','التوصيل والتركيب'])assert.ok(html.includes(value),value);
+  assert.ok(!html.includes('0.00 × 0.00'));
+ }finally{for(const key of Object.keys(p))delete p[key];Object.assign(p,priorP);for(const key of Object.keys(s))delete s[key];Object.assign(s,priorS)}
+});
