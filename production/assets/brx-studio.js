@@ -219,33 +219,52 @@ function create3D(){
   console.error('Biet Al Reef WebGL:',e);if(merchant)createPlanFallback(mount);else document.querySelector('#brx-error').hidden=false;
  }
 }
-// Dimensions describe the current model geometry. Gaps are measured to the
-// opening edges (1.24 m), not to the slightly narrower 1.20 m door frame.
+// Door clearances run from each wall end to the outer frame. The opening
+// remains 1.24 m wide to leave construction clearance around the 1.20 m frame.
 function wallDoorMeasurements(item){
  const center=item.wall==='left'?item.z:item.x;
- return {before:Math.max(0,center+2-.62),after:Math.max(0,2-center-.62),opening:1.24,width:1.2,height:2.3};
+ return {before:Math.max(0,center+2-.6),after:Math.max(0,2-center-.6),opening:1.24,width:1.2,height:2.3};
 }
+// Bounding dimensions are derived from the actual procedural model geometry.
+function measuredModelBounds(item){
+ const type=ITEMS.find(x=>x.id===item.type)?.model;
+ const bounds={'wooden-kitchen':[-1.55,1.06,-.51,1.325],'wooden-wardrobe':[-1.27,1.27,-.335,.3365]}[type];
+ if(!bounds)return null;const scale=item.scale||1;
+ return {minX:bounds[0]*scale,maxX:bounds[1]*scale,minZ:bounds[2]*scale,maxZ:bounds[3]*scale,width:(bounds[1]-bounds[0])*scale,depth:(bounds[3]-bounds[2])*scale};
+}
+function modelPlanPoint(item,x,z){const a=item.rot||0,c=Math.cos(a),s=Math.sin(a);return {x:item.x+x*c+z*s,z:item.z-x*s+z*c}}
 function updateMeasurements(){
  if(!isArkleen()||!state)return;
  const viewport=document.querySelector('#brx-viewport'),svg=viewport?.querySelector('.brx-dimension-lines'),summary=document.querySelector('#brx-dimension-summary');if(!viewport||!svg||!summary)return;
  const selected=state.items.find(x=>x.uid===state.chosen&&isWallDoor(x)),door=selected||state.items.find(isWallDoor),m=door?wallDoorMeasurements(door):null;
  const fmt=v=>new Intl.NumberFormat(document.documentElement.lang.startsWith('en')?'en':'ar',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
  const room=lang('الحائط ٤٫٠٠ × ٣٫٠٠ م','Wall 4.00 × 3.00 m');
- const text=m?room+'  |  '+lang('الباب ','Door ')+fmt(m.width)+' × '+fmt(m.height)+lang(' م',' m')+'  |  '+lang('من بداية الحائط ','From wall start ')+fmt(m.before)+lang(' م',' m')+'  |  '+lang('إلى نهايته ','To wall end ')+fmt(m.after)+lang(' م',' m'):room;
+ const current=state.items.find(x=>x.uid===state.chosen&&!isWallDoor(x)),bounds=current?measuredModelBounds(current):null,currentName=current?ITEMS.find(x=>x.id===current.type):null;
+ let text=m?room+'  |  '+lang('الباب ','Door ')+fmt(m.width)+' × '+fmt(m.height)+lang(' م',' m')+'  |  '+lang('من بداية الحائط ','From wall start ')+fmt(m.before)+lang(' م',' m')+'  |  '+lang('إلى نهايته ','To wall end ')+fmt(m.after)+lang(' م',' m'):room;
+ if(viewMode==='2d'&&bounds&&currentName)text+='  |  '+lang(currentName.ar,currentName.en)+': '+fmt(bounds.width)+' × '+fmt(bounds.depth)+lang(' م',' m');
  if(summary.textContent!==text)summary.textContent=text;
  const rect=viewport.getBoundingClientRect(),w=rect.width,h=rect.height;if(w<10||h<10)return;
  svg.setAttribute('viewBox','0 0 '+w+' '+h);
  const point=(x,y,z)=>{if(planFallback)return {x:planFallback.ox+x*planFallback.unit,y:planFallback.oy+z*planFallback.unit};if(!camera)return null;const v=new T.Vector3(x,y,z).project(camera);return {x:(v.x+1)*w/2,y:(1-v.y)*h/2}};
  if(camera)camera.updateMatrixWorld();
- const plan=viewMode==='2d',top=plan?-2.20:-1.96,height=plan?0:3.15;
+ const plan=viewMode==='2d',top=plan?-2.55:-1.96,height=plan?0:3.15;
  const line=(a,b,label)=>{if(!a||!b||![a.x,a.y,b.x,b.y].every(Number.isFinite))return '';const x=(a.x+b.x)/2,y=(a.y+b.y)/2;return '<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"/><circle cx="'+a.x.toFixed(1)+'" cy="'+a.y.toFixed(1)+'" r="2"/><circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="2"/><text x="'+x.toFixed(1)+'" y="'+(y-5).toFixed(1)+'">'+label+'</text>'};
  let markup=line(point(-2,height,top),point(2,height,top),lang('٤ م','4 m'));
  markup+=line(point(top,height,-2),point(top,height,2),lang('٤ م','4 m'));
  if(!plan)markup+=line(point(2.10,0,-1.96),point(2.10,3,-1.96),lang('٣ م','3 m'));
- if(m){const c=door.wall==='left'?door.z:door.x,level=plan?0:2.46,depth=plan?-2.04:-1.88;
-  const a=door.wall==='left'?point(depth,level,c-.6):point(c-.6,level,depth),b=door.wall==='left'?point(depth,level,c+.6):point(c+.6,level,depth);
-  markup+=line(a,b,lang('الباب ','Door ')+fmt(m.width)+lang(' م',' m'));
+ if(m){const c=door.wall==='left'?door.z:door.x,level=plan?0:2.46,depth=plan?-2.28:-1.88;
+  const wallPoint=t=>door.wall==='left'?point(depth,level,t):point(t,level,depth);
+  if(plan){
+   markup+=line(wallPoint(-2),wallPoint(c-.6),fmt(m.before)+lang(' م',' m'));
+   markup+=line(wallPoint(c-.6),wallPoint(c+.6),fmt(m.width)+lang(' م',' m'));
+   markup+=line(wallPoint(c+.6),wallPoint(2),fmt(m.after)+lang(' م',' m'));
+  }else markup+=line(wallPoint(c-.6),wallPoint(c+.6),lang('الباب ','Door ')+fmt(m.width)+lang(' م',' m'));
  }
+ if(plan&&bounds&&current){
+  const project=(x,z)=>{const v=modelPlanPoint(current,x,z);return point(v.x,0,v.z)};
+  markup+='<g class="brx-dimension-item">'+line(project(bounds.minX,bounds.minZ-.16),project(bounds.maxX,bounds.minZ-.16),fmt(bounds.width)+lang(' م',' m'))+line(project(bounds.maxX+.16,bounds.minZ),project(bounds.maxX+.16,bounds.maxZ),fmt(bounds.depth)+lang(' م',' m'))+'</g>';
+ }
+
  svg.innerHTML=markup;
 }
 function cameraUpdate(){if(!perspectiveCamera)return;perspectiveCamera.position.set(radius*Math.sin(yaw)*Math.cos(pitch),radius*Math.sin(pitch),radius*Math.cos(yaw)*Math.cos(pitch));perspectiveCamera.lookAt(0,1.0,0);updateMeasurements()}
@@ -283,10 +302,9 @@ function planFootprint(item){
 function drawPlanFallback(){
  if(!planFallback)return;const {canvas,ctx}=planFallback,rect=canvas.getBoundingClientRect();if(rect.width<10||rect.height<10)return;
  const ratio=Math.min(window.devicePixelRatio||1,2),w=rect.width,h=rect.height;canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);
- ctx.fillStyle=isArkleen()?'#f8fafc':'#f8f4ed';ctx.fillRect(0,0,w,h);const roomWidth=isArkleen()?4:7,roomDepth=isArkleen()?4:6,unit=Math.min((w-58)/(roomWidth+.5),(h-58)/(roomDepth+.5)),ox=w/2,oy=h/2;Object.assign(planFallback,{unit,ox,oy});
+ ctx.fillStyle=isArkleen()?'#f8fafc':'#f8f4ed';ctx.fillRect(0,0,w,h);const roomWidth=isArkleen()?4:7,roomDepth=isArkleen()?4:6,unit=Math.min((w-58)/(roomWidth+1.2),(h-58)/(roomDepth+1.2)),ox=w/2,oy=h/2;Object.assign(planFallback,{unit,ox,oy});
  ctx.fillStyle=state.floor||'#e9d7bd';ctx.fillRect(ox-roomWidth/2*unit,oy-roomDepth/2*unit,roomWidth*unit,roomDepth*unit);ctx.fillStyle=isArkleen()?'rgba(255,255,255,.55)':'rgba(255,252,247,.76)';ctx.fillRect(ox-roomWidth/2*unit,oy-roomDepth/2*unit,roomWidth*unit,roomDepth*unit);ctx.strokeStyle=isArkleen()?'#cbd5e1':'#d1bfaa';ctx.lineWidth=1.5;ctx.strokeRect(ox-roomWidth/2*unit,oy-roomDepth/2*unit,roomWidth*unit,roomDepth*unit);
  if(isArkleen()){
-  ctx.fillStyle='#47627f';ctx.font='600 12px sans-serif';ctx.textAlign='center';ctx.fillText(lang('٤ م','4 m'),ox,oy-2*unit-12);ctx.save();ctx.translate(ox-2*unit-15,oy);ctx.rotate(-Math.PI/2);ctx.fillText(lang('٤ م','4 m'),0,0);ctx.restore();
   ctx.lineWidth=6;ctx.strokeStyle='#b7c5d6';for(const side of ['back','left']){let cursor=-2;const gaps=state.items.filter(x=>isWallDoor(x)&&x.wall===side).map(x=>{const c=side==='back'?x.x:x.z;return [Math.max(-2,c-.62),Math.min(2,c+.62)]}).sort((a,b)=>a[0]-b[0]);const line=(from,to)=>{if(to<=from)return;ctx.beginPath();if(side==='back'){ctx.moveTo(ox+from*unit,oy-1.96*unit);ctx.lineTo(ox+to*unit,oy-1.96*unit)}else{ctx.moveTo(ox-1.96*unit,oy+from*unit);ctx.lineTo(ox-1.96*unit,oy+to*unit)}ctx.stroke()};for(const [start,end] of gaps){line(cursor,start);cursor=Math.max(cursor,end)}line(cursor,2)}
  }
  for(const item of state.items){const [iw,id]=planFootprint(item),meta=ITEMS.find(x=>x.id===item.type),type=meta?.model||item.type;ctx.save();ctx.translate(ox+item.x*unit,oy+item.z*unit);ctx.rotate(-(item.rot||0));const left=-iw*unit/2,top=-id*unit/2,width=iw*unit,depth=id*unit;
@@ -345,7 +363,7 @@ function renderMerchantApp(root){
  '<section class="brx-layout"><aside class="brx-library"><header><small>'+tr('منتجات المتجر','STORE PRODUCTS')+'</small><h2>'+tr('اختر قطعة','Choose a piece')+'</h2></header><div class="brx-searchline"><input id="brx-search" placeholder="'+tr('ابحث عن منتج...','Search products...')+'" aria-label="'+tr('ابحث عن منتج','Search products')+'" autocomplete="off"></div><div id="brx-list" class="brx-item-list">'+listItems()+'</div><p class="brx-library-note">'+tr('نسّق المنتجات وراجع التفاصيل والمقاسات النهائية مع المتجر.','Arrange products and confirm final specifications with the store.')+'</p></aside>'+
  '<div class="brx-workspace"><div class="brx-workbar"><div><strong>'+tr('مساحتك','Your space')+'</strong><small data-brx-view-status>'+tr('عرض ثلاثي الأبعاد','3D view')+'</small>'+(isArkleen()?'<small class="brx-room-size">'+tr('الغرفة ٤ × ٤ م · ارتفاع الحائط ٣ م','Room 4 × 4 m · wall height 3 m')+'</small>':'')+'</div><div class="brx-workbuttons"><span class="brx-view-switch" role="group" aria-label="2D / 3D"><button type="button" data-brx-view="2d" aria-pressed="false">2D</button><button type="button" data-brx-view="3d" aria-pressed="true">3D</button></span><button data-brx="reset-camera">'+tr('ضبط المشهد','Reset view')+'</button><button data-brx="capture">'+tr('حفظ صورة','Save image')+'</button></div></div><div id="brx-viewport" class="brx-viewport">'+(isArkleen()?'<svg class="brx-dimension-lines" aria-hidden="true"></svg>':'')+'<div class="brx-watermark">'+tr('بيت الريف • تصميم تفاعلي','Biet Al Reef • Interactive design')+'</div><p id="brx-error" hidden>'+tr('تعذّر تشغيل العرض ثلاثي الأبعاد في هذا المتصفح.','3D preview is unavailable in this browser.')+'</p><div class="brx-canvas-tip">'+tr('اسحب القطع لتحريكها • اسحب الخلفية لتدوير المشهد','Drag a piece to move it • Drag the background to rotate')+'</div></div>'+(isArkleen()?'<div id="brx-dimension-summary" class="brx-dimension-summary"></div>':'')+'<div class="brx-footer-tools"><div><span>'+tr('تحريك القطع','Move pieces')+'</span><span>'+tr('ألوان قابلة للتغيير','Custom colours')+'</span></div><small>'+tr('تصميم قابل للتخصيص','Customisable design')+'</small></div></div>'+
  '<aside class="brx-properties"><header><small>'+tr('تخصيص التصميم','CUSTOMISE')+'</small><h2>'+tr('الألوان والخامات','Colours and materials')+'</h2></header><div id="brx-selected"></div><div class="brx-swatches" id="brx-palettes">'+palettes()+'</div><div class="brx-summary"><strong>'+tr('محتويات المشهد','In your space')+'</strong><div><span id="brx-qty"></span></div><button data-brx="export" class="brx-save-list">'+tr('تنزيل قائمة العناصر','Download item list')+'</button><button data-brx="clear" class="brx-clear">'+tr('إفراغ المساحة','Clear space')+'</button></div></aside></section>'+
- ((merchant.whatsapp||merchant.appUrl)?'<section class="brx-quote"><div><small>'+tr('تفصيل على مقاسك','MADE FOR YOUR SPACE')+'</small><h2>'+tr('اطلب عرض سعر لتصميمك','Request a quote for your design')+'</h2><p>'+tr('أخبر المتجر بما تحتاجه، وأضف المقاسات المتوفرة لديك.','Tell the store what you need and share any dimensions you have.')+'</p></div>'+(merchant.whatsapp?'<form id="brx-quote-form"><p class="brx-quote-selection" id="brx-quote-selection"></p><label>'+tr('تفاصيل الطلب','What would you like made?')+'<textarea name="details" minlength="10" maxlength="1200" required placeholder="'+tr('الخامة، اللون، التقسيم الداخلي أو أي تفاصيل أخرى','Materials, colour, internal layout or other details')+'"></textarea></label><div class="brx-quote-fields"><label>'+tr('المقاسات المتوفرة (اختياري)','Available dimensions (optional)')+'<input name="dimensions" maxlength="200" placeholder="'+tr('العرض × الارتفاع × العمق','Width × height × depth')+'"></label><label>'+tr('المدينة أو المنطقة (اختياري)','City or area (optional)')+'<input name="area" maxlength="100" placeholder="'+tr('مثال: العين','For example: Al Ain')+'"></label></div><button type="submit" class="brx-quote-submit">'+tr('متابعة الطلب عبر واتساب','Continue via WhatsApp')+' ↗</button><p class="brx-quote-note">'+tr('ستفتح المحادثة لتراجع الرسالة وترسلها. يمكنك إرفاق صورة التصميم هناك.','Review and send the message in WhatsApp. You can attach your design image there.')+'</p></form>':'')+(merchant.appUrl?'<a class="brx-quote-app" href="'+esc(merchant.appUrl)+'" target="_blank" rel="noopener noreferrer">'+tr('افتح ملف المتجر داخل تطبيق بيت الريف','Open the store in the Biet Al Reef app')+' ↗</a>':'')+'</section>':'')+'</div>';
+ ((merchant.whatsapp||merchant.appUrl)?'<section class="brx-quote"><div><small>'+tr('تفصيل على مقاسك','MADE FOR YOUR SPACE')+'</small><h2>'+tr('اطلب عرض سعر لتصميمك','Request a quote for your design')+'</h2><p>'+tr('أخبر المتجر بما تحتاجه، وأضف المقاسات المتوفرة لديك.','Tell the store what you need and share any dimensions you have.')+'</p></div>'+(merchant.whatsapp?'<form id="brx-quote-form"><p class="brx-quote-selection" id="brx-quote-selection"></p><label>'+tr('تفاصيل الطلب','What would you like made?')+'<textarea name="details" minlength="10" maxlength="1200" required placeholder="'+tr('الخامة، اللون، التقسيم الداخلي أو أي تفاصيل أخرى','Materials, colour, internal layout or other details')+'"></textarea></label><div class="brx-quote-fields"><label>'+tr('المقاسات المتوفرة (اختياري)','Available dimensions (optional)')+'<input name="dimensions" maxlength="200" placeholder="'+tr('العرض × الارتفاع × العمق','Width × height × depth')+'"></label><label>'+tr('المدينة أو المنطقة (اختياري)','City or area (optional)')+'<input name="area" maxlength="100" placeholder="'+tr('اسم المدينة أو المنطقة','City or area')+'"></label></div><button type="submit" class="brx-quote-submit">'+tr('متابعة الطلب عبر واتساب','Continue via WhatsApp')+' ↗</button><p class="brx-quote-note">'+tr('ستفتح المحادثة لتراجع الرسالة وترسلها. يمكنك إرفاق صورة التصميم هناك.','Review and send the message in WhatsApp. You can attach your design image there.')+'</p></form>':'')+(merchant.appUrl?'<a class="brx-quote-app" href="'+esc(merchant.appUrl)+'" target="_blank" rel="noopener noreferrer">'+tr('افتح ملف المتجر داخل تطبيق بيت الريف','Open the store in the Biet Al Reef app')+' ↗</a>':'')+'</section>':'')+'</div>';
  create3D();refreshInspector();refreshSummary();state.chosen&&refreshSelection();
 }
 function renderApp(){

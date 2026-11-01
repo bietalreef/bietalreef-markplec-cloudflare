@@ -43,10 +43,17 @@ test('a door opening follows the door in a four-metre room with three-metre wall
 
 
 test('door measurements track both wall positions and sum to the wall width',()=>{
- const piece=source.slice(source.indexOf('function wallDoorMeasurements('),source.indexOf('function updateMeasurements()'));
+ const piece=source.slice(source.indexOf('function wallDoorMeasurements('),source.indexOf('function measuredModelBounds('));
  const measure=new Function(piece+'; return wallDoorMeasurements')();
  for(const item of [{wall:'back',x:-1,z:-1.96},{wall:'back',x:.75,z:-1.96},{wall:'left',x:-1.96,z:.45}]){
-  const m=measure(item);assert.ok(m.before>=0&&m.after>=0);assert.ok(Math.abs(m.before+m.opening+m.after-4)<1e-8);assert.equal(m.width,1.2);assert.equal(m.height,2.3);
+  const m=measure(item);assert.ok(m.before>=0&&m.after>=0);assert.ok(Math.abs(m.before+m.width+m.after-4)<1e-8);assert.equal(m.width,1.2);assert.equal(m.height,2.3);
  }
  const d=api.model('d'),box=new T.Box3().setFromObject(d);assert.ok(Math.abs((box.max.x-box.min.x)-1.2)<.001);assert.ok(Math.abs(box.max.y-2.3)<.001);
+});
+
+
+test('selected product dimensions match the procedural 3D models at any scale',()=>{
+ const fn=source.slice(source.indexOf('function measuredModelBounds('),source.indexOf('function updateMeasurements()'));
+ const tools=new Function('ITEMS',fn+';return {measuredModelBounds,modelPlanPoint}')([{id:'k',model:'wooden-kitchen'},{id:'w',model:'wooden-wardrobe'}]);
+ for(const id of ['k','w']){const item={type:id,scale:1.25,x:1,z:-.5,rot:Math.PI/2},dims=tools.measuredModelBounds(item),b=new T.Box3().setFromObject(api.model(id)),size=new T.Vector3();b.getSize(size);assert.ok(Math.abs(dims.width-size.x*1.25)<.001);assert.ok(Math.abs(dims.depth-size.z*1.25)<.001);const q=tools.modelPlanPoint(item,1,0);assert.ok(Math.abs(q.x-item.x)<1e-8);assert.ok(Math.abs(q.z-(item.z-1))<1e-8)}
 });
