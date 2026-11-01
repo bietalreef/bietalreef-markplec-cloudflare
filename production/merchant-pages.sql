@@ -65,7 +65,7 @@ grant execute on function public.get_public_market_store_page(text) to anon,auth
 
 create or replace function public.get_public_market_product_page(p_key text)
 returns jsonb language plpgsql stable security definer set search_path = '' as $fn$
-declare v_data jsonb; v_store jsonb; v_slug text; v_matching_slugs integer;
+declare v_data jsonb; v_store jsonb; v_slug text; v_matching_slugs integer; v_units jsonb;
 begin
   if p_key is null or btrim(p_key) !~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$' then
     return jsonb_build_object('ok',false,'code','PRODUCT_NOT_PUBLIC');
@@ -79,6 +79,20 @@ begin
   v_slug:=v_data->'provider'->>'slug';
   v_store:=public.get_public_market_store_page(v_slug);
   if v_store->>'ok' is distinct from 'true' then return jsonb_build_object('ok',false,'code','PRODUCT_NOT_PUBLIC'); end if;
+  -- Keep the unit of a starting price visible on the product page itself.
+  -- Only enrich the exact published legacy record already returned above.
+  if v_data->>'source_system'='legacy_provider_product' then
+    select jsonb_strip_nulls(jsonb_build_object(
+      'price_unit_ar',nullif(p.specifications->>'price_unit_ar',''),
+      'price_unit_en',nullif(p.specifications->>'price_unit_en','')
+    )) into v_units from public.provider_products p
+    where p.is_published and p.id::text=v_data->'product'->>'id'
+      and p.provider_id::text=v_data->'product'->>'provider_id' limit 1;
+    if v_units is not null then
+      v_data:=jsonb_set(v_data,'{product,specifications}',
+        coalesce(v_data->'product'->'specifications','{}'::jsonb)||v_units,true);
+    end if;
+  end if;
   if v_data->'product'->>'price_mode'='quote_required' then
     v_data:=jsonb_set(v_data,'{product}',(v_data->'product') - 'price' - 'price_from' - 'price_to');
   end if;
