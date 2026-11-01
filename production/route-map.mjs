@@ -11,7 +11,8 @@ export function fromLegacy(fragment) {
  if(name==='info'&&params.get('slug')){const slug=params.get('slug');path=slug==='how-to-buy'?'/how-to-buy':'/guides/'+encodeURIComponent(slug);params.delete('slug');}
  if(name==='owner'&&params.get('topic')){path='/business/'+encodeURIComponent(params.get('topic'));params.delete('topic');}
  if(name==='policy'&&params.get('slug')){path='/policies/'+encodeURIComponent(params.get('slug'));params.delete('slug');}
- if((name==='public-store'||name==='public-product')&&/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(params.get('slug')||'')){path=(name==='public-store'?'/stores/':'/product/')+encodeURIComponent(params.get('slug'));params.delete('slug');}
+ if(name==='public-product'&&/^[a-z0-9][a-z0-9-]{0,119}$/.test(params.get('store')||'')&&/^[a-z0-9][a-z0-9-]{0,159}$/.test(params.get('slug')||'')){path='/products/'+encodeURIComponent(params.get('store'))+'/'+encodeURIComponent(params.get('slug'));params.delete('store');params.delete('slug');}
+ else if((name==='public-store'||name==='public-product')&&/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(params.get('slug')||'')){path=(name==='public-store'?'/stores/':'/product/')+encodeURIComponent(params.get('slug'));params.delete('slug');}
  if(name==='results')path='/search';
  if(name==='detail')path='/listing';
  if(name==='store')path='/store';
@@ -28,6 +29,7 @@ export function toLegacy(pathname,search='') {
  let match=path.match(/^\/(categories|guides|business|policies)\/([^/]+)$/);
  if(match){name={categories:'section',guides:'info',business:'owner',policies:'policy'}[match[1]];try{params.set({categories:'category',guides:'slug',business:'topic',policies:'slug'}[match[1]],decodeURIComponent(match[2]));}catch{return null;}}
  const merchant=path.match(/^\/(stores|product)\/([A-Za-z0-9][A-Za-z0-9_-]{0,159})$/);if(merchant){name=merchant[1]==='stores'?'public-store':'public-product';params.set('slug',merchant[2]);}
+ const named=path.match(/^\/products\/([a-z0-9][a-z0-9-]{0,119})\/([a-z0-9][a-z0-9-]{0,159})$/);if(named){name='public-product';params.set('store',named[1]);params.set('slug',named[2]);}
  if(path==='/search')name='results';
  if(path==='/listing')name='detail';
  if(path==='/store')name='store';

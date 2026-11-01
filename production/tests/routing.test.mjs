@@ -18,6 +18,8 @@ test('legacy page fragments map to equivalent real paths and retain filters',()=
  const cases=[['#home','/'],['#studio','/studio'],['#section?category=kitchen','/categories/kitchen'],['#results?category=furniture&type=product','/search?category=furniture&type=product'],['#info?slug=how-to-buy','/how-to-buy'],['#vision?area=studio','/experiences/design'],['#vision?area=showroom','/experiences/stores'],['#vision?area=projects','/experiences/contracting-services'],['#partners','/experiences/partnerships'],['#detail?type=product','/listing?type=product'],['#store','/store']];
  for(const [fragment,path] of cases){assert.equal(fromLegacy(fragment),path);const u=new URL(path,origin);assert.equal(toLegacy(u.pathname,u.search),fragment)}
  assert.equal(toLegacy('/en/categories/kitchen','?utm_source=google'),'#section?category=kitchen');
+ assert.equal(toLegacy('/products/arkleen/custom-wooden-kitchen','?utm_source=google'),'#public-product?store=arkleen&slug=custom-wooden-kitchen');
+ assert.equal(fromLegacy('#public-product?store=arkleen&slug=custom-wooden-kitchen'),'/products/arkleen/custom-wooden-kitchen');
  assert.equal(fromLegacy('#content'),null);assert.equal(fromLegacy('#unknown'),null);
 });
 
