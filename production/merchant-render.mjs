@@ -65,3 +65,6 @@ async function BR_LOAD_MARKET_PAGE(kind,key){
  const fn=kind==='store'?'get_public_market_store_page':'get_public_market_product_page',body=kind==='store'?{p_slug:key}:{p_key:key};
  try{const res=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(6000)});if(!res.ok)return {error:true};const data=await res.json();if(!data||data.ok!==true)return {missing:true};if(kind==='store'&&(!data.profile||!Array.isArray(data.items)))return {error:true};if(kind==='product'&&(!data.product||!data.store_profile))return {error:true};return {data}}catch{return {error:true}}
 }
+async function BR_LOAD_MARKET_SITEMAP(){
+ try{const res=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/get_public_market_sitemap',{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(6000)});if(!res.ok)return null;const data=await res.json();if(!data||data.ok!==true||!Array.isArray(data.pages)||data.pages.length>12000)return null;return data.pages.filter(x=>/^\/(?:stores|product)\/[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(x?.path||''));}catch{return null}
+}

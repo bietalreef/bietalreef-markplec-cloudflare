@@ -107,3 +107,31 @@ begin
 end; $fn$;
 revoke all on function public.get_public_market_product_feed(text) from public;
 grant execute on function public.get_public_market_product_feed(text) to anon,authenticated;
+
+-- Supply indexable merchant URLs from current approved data, without a site rebuild.
+create or replace function public.get_public_market_sitemap()
+returns jsonb language plpgsql stable security definer set search_path = '' as $fn$
+declare v_store record; v_page jsonb; v_item jsonb; v_product jsonb; v_key text; v_path text; v_seen text[]:=array[]::text[]; v_pages jsonb:='[]'::jsonb;
+begin
+  for v_store in select slug from public.provider_public_profiles where publication_status='published' and app_publication_status='published' and verification_status='verified' order by slug loop
+    v_page:=public.get_public_market_store_page(v_store.slug);
+    if v_page->>'ok' is distinct from 'true' then continue; end if;
+    v_path:='/stores/'||v_store.slug;
+    v_pages:=v_pages||jsonb_build_array(jsonb_strip_nulls(jsonb_build_object('path',v_path,'image',nullif(v_page->'profile'->>'cover',''),'updated_at',nullif(v_page->'profile'->>'updatedAt',''))));
+    for v_item in select value from jsonb_array_elements(v_page->'items') loop
+      if v_item->>'entity_type'<>'product' then continue; end if;
+      v_key:=v_item->>'route_key';if v_key is null then continue; end if;
+      v_product:=public.get_public_marketplace_product(v_key);
+      if v_product->>'ok' is distinct from 'true' or v_product->'provider'->>'slug'<>v_store.slug then continue; end if;
+      v_key:=v_product->'product'->>'route_key';
+      if v_key is null or v_key !~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$' or v_key=any(v_seen) then continue; end if;
+      v_seen:=array_append(v_seen,v_key);
+      v_pages:=v_pages||jsonb_build_array(jsonb_strip_nulls(jsonb_build_object('path','/product/'||v_key,'image',nullif(v_product->'product'->>'image_url',''),'updated_at',nullif(v_product->'product'->>'updated_at',''))));
+      if jsonb_array_length(v_pages)>=12000 then return jsonb_build_object('ok',true,'pages',v_pages); end if;
+    end loop;
+    if jsonb_array_length(v_pages)>=12000 then return jsonb_build_object('ok',true,'pages',v_pages); end if;
+  end loop;
+  return jsonb_build_object('ok',true,'pages',v_pages);
+end; $fn$;
+revoke all on function public.get_public_market_sitemap() from public;
+grant execute on function public.get_public_market_sitemap() to anon,authenticated;
