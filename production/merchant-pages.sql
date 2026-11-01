@@ -125,6 +125,34 @@ end; $fn$;
 revoke all on function public.get_public_market_product_feed(text) from public;
 grant execute on function public.get_public_market_product_feed(text) to anon,authenticated;
 
+-- The public store directory uses the same publication and entitlement gates
+-- as each store's actual page, including stores that have no products yet.
+create or replace function public.get_public_market_store_feed(p_query text default '')
+returns jsonb language plpgsql stable security definer set search_path = '' as $fn$
+declare v_store record; v_page jsonb; v_profile jsonb; v_out jsonb:='[]'::jsonb;
+  v_query text:=regexp_replace(translate(lower(left(coalesce(btrim(p_query),''),100)),'أإآٱىة','اااايه'),'[ًٌٍَُِّْٰـ]','','g');
+  v_search_text text;
+begin
+  for v_store in select slug from public.provider_public_profiles
+    where publication_status='published' and app_publication_status='published' and verification_status='verified'
+      and slug ~ '^[A-Za-z0-9][A-Za-z0-9-]{0,119}$' order by slug limit 250 loop
+    v_page:=public.get_public_market_store_page(v_store.slug);
+    if v_page->>'ok' is distinct from 'true' then continue; end if;
+    v_profile:=v_page->'profile';
+    v_search_text:=regexp_replace(translate(lower(coalesce(v_profile->>'nameAr','')||' '||coalesce(v_profile->>'nameEn','')||' '||v_store.slug),'أإآٱىة','اااايه'),'[ًٌٍَُِّْٰـ]','','g');
+    if v_query<>'' and position(v_query in v_search_text)=0 then continue; end if;
+    v_out:=v_out||jsonb_build_array(jsonb_build_object(
+      'slug',v_store.slug,'name_ar',v_profile->>'nameAr','name_en',v_profile->>'nameEn',
+      'tagline_ar',v_profile->>'taglineAr','tagline_en',v_profile->>'taglineEn',
+      'logo',v_profile->>'logo','cover',v_profile->>'cover'
+    ));
+    if jsonb_array_length(v_out)>=60 then exit; end if;
+  end loop;
+  return jsonb_build_object('ok',true,'items',v_out);
+end; $fn$;
+revoke all on function public.get_public_market_store_feed(text) from public;
+grant execute on function public.get_public_market_store_feed(text) to anon,authenticated;
+
 -- Supply indexable merchant URLs from current approved data, without a site rebuild.
 create or replace function public.get_public_market_sitemap()
 returns jsonb language plpgsql stable security definer set search_path = '' as $fn$

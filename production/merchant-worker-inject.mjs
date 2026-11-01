@@ -1,7 +1,8 @@
-if(liveHost&&url.pathname==='/api/public-market-products'&&['GET','HEAD'].includes(request.method)){
+if(liveHost&&['/api/public-market-products','/api/public-market-stores'].includes(url.pathname)&&['GET','HEAD'].includes(request.method)){
  try{
   const q=String(url.searchParams.get('q')||'').trim().slice(0,100);
-  const upstream=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/get_public_market_product_feed',{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_query:q}),signal:AbortSignal.timeout(7000)});
+  const fn=url.pathname==='/api/public-market-stores'?'get_public_market_store_feed':'get_public_market_product_feed';
+  const upstream=await fetch(MARKET_TAXONOMY_PROJECT+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:MARKET_TAXONOMY_PUBLIC_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_query:q}),signal:AbortSignal.timeout(7000)});
   if(!upstream.ok)throw new Error('Feed unavailable');const data=await upstream.json();if(!data||data.ok!==true||!Array.isArray(data.items))throw new Error('Invalid feed');
   return new Response(request.method==='HEAD'?null:JSON.stringify(data),{headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public,max-age=15','X-Content-Type-Options':'nosniff'}});
  }catch{return new Response(JSON.stringify({ok:false}),{status:503,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}})}
