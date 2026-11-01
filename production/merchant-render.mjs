@@ -58,7 +58,8 @@ function BR_MARKET_SEO(data,kind,en,canonical){
  const p=kind==='store'?data.profile:data.product, name=kind==='store'?BR_MARKET_TEXT(en?p.nameEn:p.nameAr,en,en?'Store':'متجر'):BR_MARKET_TEXT(en?p.name_en:p.name_ar,en,en?'Product':'منتج'),desc=kind==='store'?BR_MARKET_TEXT(en?p.descriptionEn:p.descriptionAr,en,''):BR_MARKET_TEXT(en?p.description_en:p.description_ar,en,''),img=BR_MARKET_URL(kind==='store'?p.cover:p.image_url);
  const schema={'@context':'https://schema.org','@type':kind==='store'?'Store':'Product',name,url:canonical};if(desc)schema.description=desc;if(img)schema.image=img.startsWith('/')?'https://app.bietalreef.ae'+img:img;
  if(kind==='product'&&p.sku)schema.sku=String(p.sku);
- if(kind==='product'&&p.checkout_enabled===true&&p.price_mode==='fixed'&&Number(p.price)>0&&/^[A-Z]{3}$/.test(String(p.currency||''))&&['in_stock','out_of_stock'].includes(p.stock_status))schema.offers={'@type':'Offer',url:canonical,price:Number(p.price),priceCurrency:p.currency,availability:'https://schema.org/'+(p.stock_status==='in_stock'?'InStock':'OutOfStock')};
+ // The marketplace checkout UI is not enabled yet; do not advertise a buyable
+ // Offer to search engines until the public purchase flow actually works.
  return '<meta property="og:type" content="website"><meta property="og:title" content="'+BR_ESC(name)+'"><meta property="og:description" content="'+BR_ESC(desc)+'"><meta property="og:url" content="'+BR_ESC(canonical)+'">'+(img?'<meta property="og:image" content="'+BR_ESC(img.startsWith('/')?'https://app.bietalreef.ae'+img:img)+'">':'')+'<script type="application/ld+json">'+JSON.stringify(schema).replace(/</g,'\\u003c')+'</script>';
 }
 async function BR_LOAD_MARKET_PAGE(kind,key){

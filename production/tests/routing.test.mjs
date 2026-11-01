@@ -105,6 +105,12 @@ test('merchant quote configuration uses only enabled contact and the real app ro
  storeData.profile.quoteEnabled=false;html=await (await response('/stores/test-workshop')).text();cfg=JSON.parse(html.match(/<script type="application\/json" id="brx-merchant-data">(.*?)<\/script>/)[1]);assert.equal(cfg.whatsapp,'');storeData.profile.quoteEnabled=true;
 });
 
+test('product structured data does not promise checkout while the public purchase flow is disabled',async()=>{
+ productData.product.checkout_enabled=true;productData.product.price_mode='fixed';productData.product.stock_status='in_stock';
+ const html=await (await response('/product/wooden-door')).text();const schema=JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);assert.equal(schema.offers,undefined);
+ productData.product.checkout_enabled=false;productData.product.price_mode='from';productData.product.stock_status='made_to_order';
+});
+
 test('public product feed returns current published results without a new build',async()=>{
  let r=await response('/api/public-market-products?q=door');assert.equal(r.status,200);assert.deepEqual((await r.json()).items.map(x=>x.route_key),['wooden-door']);
  r=await response('/api/public-market-products?q=missing');assert.deepEqual((await r.json()).items,[]);
