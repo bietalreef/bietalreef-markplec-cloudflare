@@ -100,6 +100,20 @@ test('merchant studio respects the plan and excludes unrelated or unsupported mo
  storeData.items.pop();storeData.studio_allowed=true;
 });
 
+test('product galleries render distinct safe photos and complete product details',async()=>{
+ const prior=productData.product.gallery;
+ productData.product.gallery=['https://example.com/door.webp',{url:'https://example.com/detail.webp'},'https://example.com/detail.webp','javascript:alert(1)'];
+ try{for(const prefix of ['','/en']){
+  const html=await (await response(prefix+'/product/wooden-door')).text();
+  assert.match(html,/data-merchant-slug="test-workshop"/);
+  assert.match(html,/class="merchant-product-image merchant-feature" src="https:\/\/example.com\/door.webp"/);
+  assert.equal([...html.matchAll(/data-merchant-photo=/g)].length,2);
+  assert.ok(html.includes('data-merchant-photo="https://example.com/detail.webp"'));
+  assert.ok(!html.includes('javascript:alert(1)'));
+  assert.ok(html.includes(prefix?productData.product.description_en:productData.product.description_ar));
+ }}finally{productData.product.gallery=prior}
+});
+
 test('merchant quote configuration uses only enabled contact and the real app route',async()=>{
  let html=await (await response('/stores/test-workshop')).text();let cfg=JSON.parse(html.match(/<script type="application\/json" id="brx-merchant-data">(.*?)<\/script>/)[1]);assert.equal(cfg.whatsapp,'971500000000');assert.equal(cfg.appUrl,'https://providers.bietalreef.ae/provider/BR-2000001');
  storeData.profile.quoteEnabled=false;html=await (await response('/stores/test-workshop')).text();cfg=JSON.parse(html.match(/<script type="application\/json" id="brx-merchant-data">(.*?)<\/script>/)[1]);assert.equal(cfg.whatsapp,'');storeData.profile.quoteEnabled=true;

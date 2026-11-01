@@ -20,3 +20,69 @@
  #content .brx-merchant .brx-canvas-tip{bottom:12px!important}
  .brx-quote{padding:16px;margin:14px 0}.brx-quote h2{font-size:19px}.brx-quote-fields{grid-template-columns:1fr;gap:0}
 }
+
+/* Shared 2D/3D switch for the existing marketplace studio. */
+.brx-workbuttons .brx-view-switch{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid #ded1c0;border-radius:11px;background:#f8f4ee}
+.brx-workbuttons .brx-view-switch button{min-width:42px;padding:7px 10px;border:0;border-radius:8px;background:transparent;color:#5c5047;font-weight:700;line-height:1}
+.brx-workbuttons .brx-view-switch button[aria-pressed="true"]{background:#302b29;color:#fff}
+.brx-workbuttons .brx-view-switch button:focus-visible{outline:2px solid #b6884b;outline-offset:2px}
+@media(max-width:640px){.brx-workbuttons{flex-wrap:wrap;gap:6px}.brx-workbuttons .brx-view-switch button{min-width:38px;padding:7px 8px}}
+
+/* Product photos stay on the product page and remain available in the HTML. */
+.merchant-product-gallery{display:block;min-width:0}
+.merchant-gallery-feature{overflow:hidden;border-radius:16px;background:#f5f0e8}
+.merchant-gallery-feature .merchant-product-image{display:block;width:100%;aspect-ratio:1.2;object-fit:contain;border-radius:0}
+.merchant-gallery-thumbs{display:flex;gap:8px;overflow:auto;padding:9px 2px 3px;scrollbar-width:thin}
+.merchant-gallery-thumbs button{flex:0 0 68px;width:68px;height:60px;padding:2px;border:2px solid transparent;border-radius:10px;background:#f3ede4;cursor:pointer}
+.merchant-gallery-thumbs button[aria-pressed=true]{border-color:#ad8954}
+.merchant-gallery-thumbs button:focus-visible{outline:2px solid #ad8954;outline-offset:2px}
+.merchant-gallery-thumb{width:100%;height:100%;display:block;border-radius:6px;object-fit:cover}
+.merchant-product-facts{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.merchant-product-facts div{padding:7px 10px;border:1px solid #eee3d5;border-radius:10px;background:#fff}
+.merchant-product-facts dt{font-size:11px;color:#887a6b}.merchant-product-facts dd{font-size:13px;font-weight:700;margin:2px 0 0}
+.merchant-product-summary{display:none}
+@media(max-width:720px){.merchant-gallery-feature .merchant-product-image{aspect-ratio:1.2}.merchant-gallery-thumbs button{flex-basis:58px;width:58px;height:50px}.merchant-product-summary{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin:10px 0;color:#70655b;font-size:13px}.merchant-product-details{margin-top:10px;padding-top:10px}.merchant-product-facts{margin:8px 0;gap:6px}}
+
+/* Arkleen's own store and product pages use a clean white and blue palette. */
+#content:has(.merchant-page[data-merchant-slug="arkleen"]){background:#fff!important}
+.merchant-page[data-merchant-slug="arkleen"]{color:#16243b}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-hero,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-about,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-product,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-design-hero{background:#fff;border-color:#e1e8f2}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-identity small,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-product-info small,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-heading span,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-card-copy span,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-product-price{color:#1d4ed8}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-primary,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-tabs button[aria-pressed=true]{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-secondary,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-tabs button{background:#fff;color:#1d4ed8;border-color:#cbd8ee}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-card,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-product-facts div{border-color:#e1e8f2;background:#fff}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-gallery-feature,
+.merchant-page[data-merchant-slug="arkleen"] .merchant-gallery-thumbs button{background:#f5f8fc}
+.merchant-page[data-merchant-slug="arkleen"] .merchant-gallery-thumbs button[aria-pressed=true]{border-color:#2563eb}
+.merchant-page[data-merchant-slug="arkleen"] :is(button,a):focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant{--forest:#17345c;--gold:#2563eb;--border:#e1e8f2;color:#16243b}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-intro h2,.brx-library h2,.brx-properties h2,.brx-workbar strong,.brx-product-text strong,.brx-chosen strong){color:#16243b}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-intro small,.brx-library header>small,.brx-properties header>small,.brx-product-text a){color:#2563eb}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-library,.brx-workspace,.brx-properties){background:#fff;border-color:#e1e8f2;box-shadow:0 8px 24px #1e3a5f0a}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-product,.brx-searchline input){background:#fff;border-color:#e1e8f2}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-product-text button,.brx-save-list,.brx-primary){background:#1d4ed8!important;border-color:#1d4ed8!important;color:#fff!important}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-head-actions button:not(.brx-primary),.brx-workbuttons>button,.brx-ops button:not(.brx-danger),.brx-clear){background:#f5f9ff;color:#1d4ed8;border-color:#d4e2f7}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-head-actions button,.brx-workbuttons button,.brx-product-text button,.brx-ops button,.brx-save-list,.brx-clear){transition:background .18s ease,border-color .18s ease}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-head-actions button,.brx-workbuttons button,.brx-product-text button,.brx-ops button,.brx-save-list,.brx-clear):not(:disabled):hover{filter:brightness(.96)}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant :is(.brx-chosen,.brx-selecthint,.brx-footer-tools span){background:#f1f6fe;color:#385678}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-chosen>span{background:#dfeeff;color:#2563eb}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-viewport{background:#f8fafc}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-canvas-tip{background:#16365fdf;color:#fff}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-view-switch{background:#f3f7fd;border-color:#d4e2f7}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-view-switch button{color:#315477}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-view-switch button[aria-pressed=true],
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-merchant .brx-mobile-tabs button[aria-selected=true]{background:#1d4ed8!important;color:#fff!important}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-quote{background:#f6f9fe;border-color:#e1e8f2;color:#16243b}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-quote small{color:#2563eb}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-quote-submit{background:#1d4ed8;color:#fff}
+#content .merchant-page[data-merchant-slug="arkleen"] .brx-quote-app{background:#fff;border-color:#cbd8ee;color:#1d4ed8}
