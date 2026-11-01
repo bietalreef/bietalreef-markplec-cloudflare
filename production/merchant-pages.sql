@@ -126,7 +126,7 @@ begin
       v_key:=v_product->'product'->>'route_key';
       if v_key is null or v_key !~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$' or v_key=any(v_seen) then continue; end if;
       v_seen:=array_append(v_seen,v_key);
-      v_pages:=v_pages||jsonb_build_array(jsonb_strip_nulls(jsonb_build_object('path','/product/'||v_key,'image',nullif(v_product->'product'->>'image_url',''),'updated_at',nullif(v_product->'product'->>'updated_at',''))));
+      v_pages:=v_pages||jsonb_build_array(jsonb_strip_nulls(jsonb_build_object('path','/product/'||v_key,'image',nullif(v_product->'product'->>'image_url',''),'images',case when jsonb_typeof(v_product->'product'->'gallery')='array' then v_product->'product'->'gallery' else '[]'::jsonb end,'updated_at',nullif(v_product->'product'->>'updated_at',''))));
       if jsonb_array_length(v_pages)>=12000 then return jsonb_build_object('ok',true,'pages',v_pages); end if;
     end loop;
     if jsonb_array_length(v_pages)>=12000 then return jsonb_build_object('ok',true,'pages',v_pages); end if;

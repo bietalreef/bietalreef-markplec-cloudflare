@@ -111,8 +111,8 @@ test('public product feed returns current published results without a new build'
 });
 
 test('sitemap updates dynamically for published merchant pages and fails safely on source errors',async()=>{
- marketSitemap=[{path:'/stores/test-workshop',image:'https://example.com/cover.webp',updated_at:'2026-11-01T00:00:00Z'},{path:'/product/wooden-door',image:'https://example.com/door.webp'},{path:'/stores/invalid?redirect=x'}];
- const xml=await (await response('/sitemap.xml')).text();for(const path of ['/stores/test-workshop','/en/stores/test-workshop','/product/wooden-door','/en/product/wooden-door'])assert.ok(xml.includes('<loc>'+origin+path+'</loc>'));assert.ok(xml.includes('https://example.com/door.webp'));assert.ok(!xml.includes('invalid?redirect'));
+ marketSitemap=[{path:'/stores/test-workshop',image:'https://example.com/cover.webp',updated_at:'2026-11-01T00:00:00Z'},{path:'/product/wooden-door',image:'https://example.com/door.webp',images:['https://example.com/door.webp','https://example.com/detail.webp',{url:'https://example.com/finish.webp'},'javascript:alert(1)']},{path:'/stores/invalid?redirect=x'}];
+ const xml=await (await response('/sitemap.xml')).text();for(const path of ['/stores/test-workshop','/en/stores/test-workshop','/product/wooden-door','/en/product/wooden-door'])assert.ok(xml.includes('<loc>'+origin+path+'</loc>'));for(const src of ['door.webp','detail.webp','finish.webp'])assert.equal(xml.split('https://example.com/'+src).length-1,2);assert.ok(!xml.includes('javascript:alert'));assert.ok(!xml.includes('invalid?redirect'));
  marketSitemap=[];assert.ok(!(await (await response('/sitemap.xml')).text()).includes('/stores/test-workshop'));
  marketSitemapDown=true;assert.equal((await response('/sitemap.xml')).status,503);marketSitemapDown=false;
 });
