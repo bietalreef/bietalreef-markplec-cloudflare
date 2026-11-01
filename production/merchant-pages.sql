@@ -29,8 +29,21 @@ begin
   v_profile:=v_profile||jsonb_build_object('quoteEnabled',v_quotes);
   v_catalog:=public.get_public_store_catalog(v_id,50);
   v_items:=case when v_catalog->>'ok'='true' and jsonb_typeof(v_catalog->'items')='array' then v_catalog->'items' else '[]'::jsonb end;
-  select coalesce(jsonb_agg(case when item->>'price_mode'='quote_required' then item - 'price' - 'price_from' - 'price_to' else item end order by ord),'[]'::jsonb) into v_items
-    from jsonb_array_elements(v_items) with ordinality x(item,ord);
+  -- The unified catalog may already contain a legacy product. Enrich that
+  -- exact published product before deduplication, so its studio model is not lost.
+  select coalesce(jsonb_agg(
+    (case when item->>'price_mode'='quote_required' then item - 'price' - 'price_from' - 'price_to' else item end - 'studio_model')
+    || case when legacy.sku is not null then jsonb_strip_nulls(jsonb_build_object(
+      'studio_model',case when legacy.specifications->>'studio_model' in ('wooden-kitchen','wooden-wardrobe','wooden-door') then legacy.specifications->>'studio_model' else null end,
+      'details',(case when jsonb_typeof(item->'details')='object' then item->'details' else '{}'::jsonb end)||jsonb_strip_nulls(jsonb_build_object('sku',legacy.sku,'price_unit_ar',legacy.specifications->>'price_unit_ar','price_unit_en',legacy.specifications->>'price_unit_en'))
+    )) else '{}'::jsonb end order by ord),'[]'::jsonb) into v_items
+  from jsonb_array_elements(v_items) with ordinality x(item,ord)
+  left join lateral (
+    select p.sku,p.specifications from public.provider_products p
+    where item->>'entity_type'='product' and p.provider_id=v_id and p.is_published
+      and (p.sku=coalesce(item->'details'->>'sku',item->>'route_key','') or p.id::text=coalesce(item->>'entity_id',''))
+    limit 1
+  ) legacy on true;
   -- Legacy products remain subject to their original publication and eligibility checks.
   select coalesce(jsonb_agg(jsonb_build_object(
     'entity_type','product','entity_id',p.id,'route_key',p.sku,
