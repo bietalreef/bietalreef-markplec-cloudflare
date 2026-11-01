@@ -90,14 +90,17 @@ grant execute on function public.get_public_market_product_page(text) to anon,au
 -- Read live, eligible product records; never synthesize or expose draft listings.
 create or replace function public.get_public_market_product_feed(p_query text default '')
 returns jsonb language plpgsql stable security definer set search_path = '' as $fn$
-declare v_store record; v_page jsonb; v_item jsonb; v_out jsonb:='[]'::jsonb; v_query text:=lower(left(coalesce(btrim(p_query),''),100));
+declare v_store record; v_page jsonb; v_item jsonb; v_out jsonb:='[]'::jsonb;
+  v_query text:=regexp_replace(translate(lower(left(coalesce(btrim(p_query),''),100)),'أإآٱىة','اااايه'),'[ًٌٍَُِّْٰـ]','','g');
+  v_search_text text;
 begin
   for v_store in select slug from public.provider_public_profiles where publication_status='published' and app_publication_status='published' and verification_status='verified' order by slug limit 250 loop
     v_page:=public.get_public_market_store_page(v_store.slug);
     if v_page->>'ok' is distinct from 'true' then continue; end if;
     for v_item in select value from jsonb_array_elements(v_page->'items') loop
       if v_item->>'entity_type'<>'product' or coalesce(v_item->>'route_key','')='' then continue; end if;
-      if v_query<>'' and position(v_query in lower(coalesce(v_item->>'title_ar','')||' '||coalesce(v_item->>'title_en','')||' '||coalesce(v_page->'profile'->>'nameAr','')||' '||coalesce(v_page->'profile'->>'nameEn','')))=0 then continue; end if;
+      v_search_text:=regexp_replace(translate(lower(coalesce(v_item->>'title_ar','')||' '||coalesce(v_item->>'title_en','')||' '||coalesce(v_page->'profile'->>'nameAr','')||' '||coalesce(v_page->'profile'->>'nameEn','')),'أإآٱىة','اااايه'),'[ًٌٍَُِّْٰـ]','','g');
+      if v_query<>'' and position(v_query in v_search_text)=0 then continue; end if;
       if public.get_public_market_product_page(v_item->>'route_key')->>'ok' is distinct from 'true' then continue; end if;
       v_out:=v_out||jsonb_build_array(v_item||jsonb_build_object('store_slug',v_store.slug,'store_name_ar',v_page->'profile'->>'nameAr','store_name_en',v_page->'profile'->>'nameEn'));
       if jsonb_array_length(v_out)>=60 then return jsonb_build_object('ok',true,'items',v_out); end if;
