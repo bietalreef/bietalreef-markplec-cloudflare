@@ -87,7 +87,9 @@ begin
   if v_data->>'source_system'='legacy_provider_product' then
     select jsonb_strip_nulls(jsonb_build_object(
       'price_unit_ar',nullif(p.specifications->>'price_unit_ar',''),
-      'price_unit_en',nullif(p.specifications->>'price_unit_en','')
+      'price_unit_en',nullif(p.specifications->>'price_unit_en',''),
+      'highlights_ar',case when jsonb_typeof(p.specifications->'highlights_ar')='array' then p.specifications->'highlights_ar' end,
+      'highlights_en',case when jsonb_typeof(p.specifications->'highlights_en')='array' then p.specifications->'highlights_en' end
     )),case when p.slug ~ '^[a-z0-9][a-z0-9-]{0,159}$' and 1=(select count(*) from public.provider_products p2 where p2.provider_id=p.provider_id and p2.is_published and p2.slug=p.slug) then p.slug end into v_units,v_product_slug from public.provider_products p
     where p.is_published and p.id::text=v_data->'product'->>'id'
       and p.provider_id::text=v_data->'product'->>'provider_id' limit 1;

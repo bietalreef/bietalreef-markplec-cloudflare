@@ -111,3 +111,36 @@
 .merchant-gallery-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);direction:ltr;padding:4px 10px;border-radius:999px;background:#102b4acc;color:#fff;font-size:11px}
 .merchant-gallery-feature button:focus-visible,.merchant-card-thumbs button:focus-visible{outline:3px solid #60a5fa;outline-offset:2px}
 @media(max-width:720px){.merchant-card-thumbs{gap:4px;padding:7px 9px 0}.merchant-card-thumbs button{flex-basis:36px;width:36px;height:33px}.merchant-rating{gap:4px}.merchant-rating span{font-size:14px}.merchant-rating small{font-size:10px}.merchant-gallery-prev,.merchant-gallery-next{width:36px;height:36px;font-size:23px}}
+
+/* Arkleen: keep the model visible while the phone tools open below it. */
+.merchant-page[data-merchant-slug="arkleen"] .brx-dimension-lines{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;overflow:visible}
+.merchant-page[data-merchant-slug="arkleen"] .brx-dimension-lines line{stroke:#2563eb;stroke-width:1.4;stroke-dasharray:4 3}
+.merchant-page[data-merchant-slug="arkleen"] .brx-dimension-lines circle{fill:#2563eb}
+.merchant-page[data-merchant-slug="arkleen"] .brx-dimension-lines text{fill:#17449b;stroke:#fff;stroke-width:3px;paint-order:stroke;text-anchor:middle;font:700 11px sans-serif}
+.merchant-page[data-merchant-slug="arkleen"] .brx-dimension-summary{padding:10px 14px;background:#f5f9ff;border-top:1px solid #e1e8f2;color:#24446f;font-size:12px;line-height:1.8;text-align:center;direction:rtl}
+[dir=ltr] .merchant-page[data-merchant-slug="arkleen"] .brx-dimension-summary{direction:ltr}
+@media(max-width:1100px){
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-workspace{display:grid!important;grid-template-columns:minmax(0,1fr) 66px!important;grid-template-rows:auto auto auto auto;direction:ltr;align-items:stretch;overflow:visible!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-workbar{grid-row:1;grid-column:1/-1;display:flex!important;flex-wrap:wrap;align-items:center;gap:8px!important;padding:10px!important;height:auto!important;min-height:0!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-workbar>div:first-of-type{display:flex!important;flex-direction:column;gap:3px;min-width:0;flex:1 1 130px;direction:rtl}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-workbar strong{line-height:1.3}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-workbar small{display:block;line-height:1.4}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-workbuttons{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;direction:rtl}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-viewport{grid-row:2;grid-column:1;width:100%!important;height:clamp(300px,85vw,460px)!important;min-height:300px!important;overflow:hidden!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-canvas-tip{display:none!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-dimension-summary{grid-row:3;grid-column:1/-1;font-size:11px;padding:8px}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-dock{display:contents!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-tabs{grid-row:2;grid-column:2;display:flex!important;flex-direction:column!important;justify-content:center;align-items:stretch;height:100%!important;gap:4px!important;padding:5px!important;border-left:1px solid #e1e8f2;background:#fff!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-tabs button{flex:1 1 0;min-height:46px;max-height:70px;font-size:9px;color:#40536c}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-tabs button span{font-size:19px}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-panel{grid-row:4;grid-column:1/-1;display:none!important;position:static!important;inset:auto!important;max-height:none!important;overflow:visible!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:none!important;box-shadow:none!important;border:0;border-top:1px solid #e1e8f2;border-radius:0;padding:14px!important;direction:rtl}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-dock.brx-panel-open .brx-mobile-panel{display:block!important}
+ #content .merchant-page[data-merchant-slug="arkleen"] .brx-mobile-products{max-height:none!important}
+ [dir=ltr] #content .merchant-page[data-merchant-slug="arkleen"] :is(.brx-workbar>div:first-of-type,.brx-mobile-panel){direction:ltr}
+}
+.merchant-product-guide{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.merchant-product-guide>div{background:#fff;border:1px solid #e1e8f2;border-radius:18px;padding:22px;color:#263b57}
+.merchant-product-guide h2{margin:0 0 14px;color:#152b49;font-size:19px}
+.merchant-product-guide :is(ul,ol){margin:0;padding-inline-start:22px;line-height:1.9;font-size:14px}
+.merchant-product-guide li+li{margin-top:7px}.merchant-product-guide li::marker{color:#2563eb}
+@media(max-width:720px){.merchant-product-guide{grid-template-columns:1fr;gap:10px;margin-top:12px}.merchant-product-guide>div{padding:16px}.merchant-product-guide h2{font-size:16px}.merchant-product-guide :is(ul,ol){font-size:13px}}

@@ -141,7 +141,7 @@ function model(type){
   box(g,0,.13,.10,.45,.06,.28,walnut);
  }else if(type==='wooden-door'){
   const doorWood=mat('#75543c',.62),groove=mat('#523b2b',.7),edge=mat('#bd995d',.3,.65);
-  for(const x of [-.55,.55])box(g,x,1.13,0,.11,2.26,.18,doorWood);box(g,0,2.23,0,1.2,.12,.18,doorWood);
+  for(const x of [-.545,.545])box(g,x,1.13,0,.11,2.26,.18,doorWood);box(g,0,2.24,0,1.2,.12,.18,doorWood);
   const leaf=new T.Group();leaf.position.set(-.49,0,.03);leaf.rotation.y=-.24;g.add(leaf);box(leaf,.47,1.10,0,.94,2.14,.075,doorWood);
   for(const y of [.52,1.08,1.68])box(leaf,.47,y,.041,.78,.009,.008,groove,false);
   for(const x of [.19,.73])box(leaf,x,1.1,.041,.009,1.86,.008,groove,false);
@@ -204,7 +204,7 @@ function create3D(){
  const fill=new T.DirectionalLight('#dfece8',1.1);fill.position.set(-3,3,-1);scene.add(fill);
  furniture=new T.Group();scene.add(furniture);
  rebuild();
- const resizeFn=()=>{if(!renderer)return;const rect=mount.getBoundingClientRect();if(rect.width<10||rect.height<10)return;renderer.setSize(rect.width,rect.height,false);const aspect=rect.width/rect.height;perspectiveCamera.aspect=aspect;perspectiveCamera.updateProjectionMatrix();const halfHeight=Math.max(3.7,3.8/aspect);planCamera.left=-halfHeight*aspect;planCamera.right=halfHeight*aspect;planCamera.top=halfHeight;planCamera.bottom=-halfHeight;planCamera.updateProjectionMatrix()};
+ const resizeFn=()=>{if(!renderer)return;const rect=mount.getBoundingClientRect();if(rect.width<10||rect.height<10)return;renderer.setSize(rect.width,rect.height,false);const aspect=rect.width/rect.height;perspectiveCamera.aspect=aspect;perspectiveCamera.updateProjectionMatrix();const halfHeight=Math.max(3.7,3.8/aspect);planCamera.left=-halfHeight*aspect;planCamera.right=halfHeight*aspect;planCamera.top=halfHeight;planCamera.bottom=-halfHeight;planCamera.updateProjectionMatrix();updateMeasurements()};
  resize=new ResizeObserver(resizeFn);resize.observe(mount);resizeFn();cameraUpdate();setTimeout(renderThumbnails,380);
  const loop=()=>{if(!renderer)return;renderer.render(scene,camera);raf=requestAnimationFrame(loop)};loop();
  renderer.domElement.addEventListener('pointerdown',startPointer);
@@ -219,15 +219,45 @@ function create3D(){
   console.error('Biet Al Reef WebGL:',e);if(merchant)createPlanFallback(mount);else document.querySelector('#brx-error').hidden=false;
  }
 }
-function cameraUpdate(){if(!perspectiveCamera)return;perspectiveCamera.position.set(radius*Math.sin(yaw)*Math.cos(pitch),radius*Math.sin(pitch),radius*Math.cos(yaw)*Math.cos(pitch));perspectiveCamera.lookAt(0,1.0,0)}
+// Dimensions describe the current model geometry. Gaps are measured to the
+// opening edges (1.24 m), not to the slightly narrower 1.20 m door frame.
+function wallDoorMeasurements(item){
+ const center=item.wall==='left'?item.z:item.x;
+ return {before:Math.max(0,center+2-.62),after:Math.max(0,2-center-.62),opening:1.24,width:1.2,height:2.3};
+}
+function updateMeasurements(){
+ if(!isArkleen()||!state)return;
+ const viewport=document.querySelector('#brx-viewport'),svg=viewport?.querySelector('.brx-dimension-lines'),summary=document.querySelector('#brx-dimension-summary');if(!viewport||!svg||!summary)return;
+ const selected=state.items.find(x=>x.uid===state.chosen&&isWallDoor(x)),door=selected||state.items.find(isWallDoor),m=door?wallDoorMeasurements(door):null;
+ const fmt=v=>new Intl.NumberFormat(document.documentElement.lang.startsWith('en')?'en':'ar',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+ const room=lang('الحائط ٤٫٠٠ × ٣٫٠٠ م','Wall 4.00 × 3.00 m');
+ const text=m?room+'  |  '+lang('الباب ','Door ')+fmt(m.width)+' × '+fmt(m.height)+lang(' م',' m')+'  |  '+lang('من بداية الحائط ','From wall start ')+fmt(m.before)+lang(' م',' m')+'  |  '+lang('إلى نهايته ','To wall end ')+fmt(m.after)+lang(' م',' m'):room;
+ if(summary.textContent!==text)summary.textContent=text;
+ const rect=viewport.getBoundingClientRect(),w=rect.width,h=rect.height;if(w<10||h<10)return;
+ svg.setAttribute('viewBox','0 0 '+w+' '+h);
+ const point=(x,y,z)=>{if(planFallback)return {x:planFallback.ox+x*planFallback.unit,y:planFallback.oy+z*planFallback.unit};if(!camera)return null;const v=new T.Vector3(x,y,z).project(camera);return {x:(v.x+1)*w/2,y:(1-v.y)*h/2}};
+ if(camera)camera.updateMatrixWorld();
+ const plan=viewMode==='2d',top=plan?-2.20:-1.96,height=plan?0:3.15;
+ const line=(a,b,label)=>{if(!a||!b||![a.x,a.y,b.x,b.y].every(Number.isFinite))return '';const x=(a.x+b.x)/2,y=(a.y+b.y)/2;return '<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"/><circle cx="'+a.x.toFixed(1)+'" cy="'+a.y.toFixed(1)+'" r="2"/><circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="2"/><text x="'+x.toFixed(1)+'" y="'+(y-5).toFixed(1)+'">'+label+'</text>'};
+ let markup=line(point(-2,height,top),point(2,height,top),lang('٤ م','4 m'));
+ markup+=line(point(top,height,-2),point(top,height,2),lang('٤ م','4 m'));
+ if(!plan)markup+=line(point(2.10,0,-1.96),point(2.10,3,-1.96),lang('٣ م','3 m'));
+ if(m){const c=door.wall==='left'?door.z:door.x,level=plan?0:2.46,depth=plan?-2.04:-1.88;
+  const a=door.wall==='left'?point(depth,level,c-.6):point(c-.6,level,depth),b=door.wall==='left'?point(depth,level,c+.6):point(c+.6,level,depth);
+  markup+=line(a,b,lang('الباب ','Door ')+fmt(m.width)+lang(' م',' m'));
+ }
+ svg.innerHTML=markup;
+}
+function cameraUpdate(){if(!perspectiveCamera)return;perspectiveCamera.position.set(radius*Math.sin(yaw)*Math.cos(pitch),radius*Math.sin(pitch),radius*Math.cos(yaw)*Math.cos(pitch));perspectiveCamera.lookAt(0,1.0,0);updateMeasurements()}
 function setViewMode(mode){
- if(planFallback){viewMode='2d';document.querySelectorAll('[data-brx-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.brxView==='2d')));const label=document.querySelector('[data-brx-view-status]');if(label)label.textContent=lang('عرض ثنائي الأبعاد','2D view');drawPlanFallback();return}
+ if(planFallback){viewMode='2d';document.querySelectorAll('[data-brx-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.brxView==='2d')));const label=document.querySelector('[data-brx-view-status]');if(label)label.textContent=lang('عرض ثنائي الأبعاد','2D view');drawPlanFallback();updateMeasurements();return}
  if(!perspectiveCamera||!planCamera)return;
  viewMode=mode==='2d'?'2d':'3d';camera=viewMode==='2d'?planCamera:perspectiveCamera;
  if(isArkleen())room?.getObjectByName('arkleen-walls')?.traverse(x=>{if(x.userData.doorHeader)x.visible=viewMode!=='2d'});
  document.querySelectorAll('[data-brx-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.brxView===viewMode)));
  const label=document.querySelector('[data-brx-view-status]');if(label)label.textContent=viewMode==='2d'?lang('عرض ثنائي الأبعاد','2D view'):lang('عرض ثلاثي الأبعاد','3D view');
  const tip=document.querySelector('#brx-viewport .brx-canvas-tip');if(tip)tip.textContent=viewMode==='2d'?lang('اسحب المنتجات لترتيبها في التصميم','Drag products to arrange your design'):lang('اسحب القطع لتحريكها • اسحب الخلفية لتدوير المشهد','Drag a piece to move it • Drag the background to rotate');
+ updateMeasurements();
 }
 // A usable plan view remains available on devices where WebGL cannot start.
 function createPlanFallback(mount){
@@ -238,7 +268,7 @@ function createPlanFallback(mount){
  const three=document.querySelector('[data-brx-view="3d"]');if(three){three.disabled=true;three.title=lang('العرض ثلاثي الأبعاد غير متاح على هذا الجهاز','3D view is unavailable on this device')}
  const tip=document.querySelector('#brx-viewport .brx-canvas-tip');if(tip)tip.textContent=lang('اسحب القطع لترتيبها في المساحة','Drag pieces to arrange your space');
  function point(e){const rect=canvas.getBoundingClientRect();return {x:(e.clientX-rect.left-planFallback.ox)/planFallback.unit,z:(e.clientY-rect.top-planFallback.oy)/planFallback.unit}}
- canvas.addEventListener('pointerdown',e=>{const p=point(e);let best=null;for(const item of [...state.items].reverse()){const [w,d]=planFootprint(item);const dx=p.x-item.x,dz=p.z-item.z,a=item.rot||0;const x=dx*Math.cos(a)-dz*Math.sin(a),z=dx*Math.sin(a)+dz*Math.cos(a);if(Math.abs(x)<=w/2+.12&&Math.abs(z)<=d/2+.12){best=item;break}}if(!best)return;planFallback.active={id:best.uid,point:p,x:best.x,z:best.z,before:JSON.stringify(state),moved:false};state.chosen=best.uid;canvas.setPointerCapture?.(e.pointerId);refreshInspector();drawPlanFallback()});
+ canvas.addEventListener('pointerdown',e=>{const p=point(e);let best=null;for(const item of [...state.items].reverse()){const [w,d]=planFootprint(item);const dx=p.x-item.x,dz=p.z-item.z,a=item.rot||0;const x=dx*Math.cos(a)-dz*Math.sin(a),z=dx*Math.sin(a)+dz*Math.cos(a);if(Math.abs(x)<=w/2+.12&&Math.abs(z)<=d/2+.12){best=item;break}}if(!best)return;planFallback.active={id:best.uid,point:p,x:best.x,z:best.z,before:JSON.stringify(state),moved:false};state.chosen=best.uid;canvas.setPointerCapture?.(e.pointerId);refreshInspector();drawPlanFallback();updateMeasurements()});
  canvas.addEventListener('pointermove',e=>{const drag=planFallback?.active;if(!drag)return;const item=state.items.find(x=>x.uid===drag.id);if(!item)return;const p=point(e),x=drag.x+p.x-drag.point.x,z=drag.z+p.z-drag.point.z;if(isWallDoor(item))placeWallDoor(item,x,z);else if(isArkleen())fitArkleenItem(item,x,z);else{item.x=Math.max(-3,Math.min(3,x));item.z=Math.max(-2.4,Math.min(2.7,z))}drag.moved=true;update3D()});
  const finish=()=>{const drag=planFallback?.active;if(drag?.moved){past.push(drag.before);future=[];save();refreshSummary()}if(planFallback)planFallback.active=null};
  canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);
@@ -271,6 +301,7 @@ function drawPlanFallback(){
    ctx.fillRect(left,top,width*.12,depth);ctx.fillRect(left,top,width,Math.max(4,depth*.12));ctx.strokeRect(left,top,width,Math.max(4,depth*.12));ctx.strokeStyle='#aa8b67';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(left+width*.12,top+depth*.12,width*.72,0,Math.PI/2);ctx.stroke();ctx.beginPath();ctx.moveTo(left+width*.12,top+depth*.12);ctx.lineTo(left+width*.58,top+depth*.66);ctx.stroke();
   }
   ctx.restore()}
+ updateMeasurements();
 }
 function rebuild(){
  if(!scene){drawPlanFallback();return}
@@ -281,20 +312,21 @@ function rebuild(){
  roomBuild();
  state.items.forEach(addGroup);
  if(viewMode==='2d')drawPlanFallback();
+ updateMeasurements();
 }
 function addGroup(item){
  let group=model(item.type);group.userData.itemUid=item.uid;
  group.position.set(item.x,0,item.z);group.rotation.y=item.rot||0;group.scale.setScalar(item.scale||1);
  furniture.add(group);objects.set(item.uid,group)
 }
-function update3D(){if(planFallback&&viewMode==='2d')drawPlanFallback();if(isArkleen())updateArkleenWalls();if(!objects.size)return;for(const item of state.items){const o=objects.get(item.uid);if(o){o.position.set(item.x,0,item.z);o.rotation.y=item.rot||0;o.scale.setScalar(item.scale||1)}}}
+function update3D(){if(planFallback&&viewMode==='2d')drawPlanFallback();if(isArkleen())updateArkleenWalls();updateMeasurements();if(!objects.size)return;for(const item of state.items){const o=objects.get(item.uid);if(o){o.position.set(item.x,0,item.z);o.rotation.y=item.rot||0;o.scale.setScalar(item.scale||1)}}}
 const ray=new T.Raycaster(),mouse=new T.Vector2(),ground=new T.Plane(new T.Vector3(0,1,0),0);
 function pick(event){let c=renderer.domElement.getBoundingClientRect();mouse.set((event.clientX-c.left)/c.width*2-1,-((event.clientY-c.top)/c.height*2-1));ray.setFromCamera(mouse,camera);let intersections=ray.intersectObjects([...objects.values()],true);const picked=intersections.find(x=>x.object.visible);if(!picked)return null;let o=picked.object;while(o&&!o.userData.itemUid)o=o.parent;return o?.userData.itemUid||null}
 function floorIntersect(event){const box=renderer.domElement.getBoundingClientRect();mouse.set((event.clientX-box.left)/box.width*2-1,-((event.clientY-box.top)/box.height*2-1));ray.setFromCamera(mouse,camera);const out=new T.Vector3();return ray.ray.intersectPlane(ground,out)?out:null}
 function startPointer(e){
  if(!renderer)return;const id=pick(e),point=floorIntersect(e);
  drag={pointer:e.pointerId,x:e.clientX,y:e.clientY,id,point,startItem:clone(state.items),before:JSON.stringify(state),yaw,pitch,moved:false};
- if(id){state.chosen=id;refreshInspector();refreshSelection()}
+ if(id){state.chosen=id;refreshInspector();refreshSelection();updateMeasurements()}
  renderer.domElement.setPointerCapture?.(e.pointerId);
 }
 function movePointer(e){
@@ -311,7 +343,7 @@ function renderMerchantApp(root){
  const tr=lang;
  root.innerHTML='<div class="brx-studio brx-merchant" id="'+ID+'"><header class="brx-intro"><div><small>BIET AL REEF / DESIGN STUDIO</small><h2>'+tr('صمّم مساحتك مع المتجر','Design your space with this store')+'</h2><p>'+tr('اختر منتجًا وحرّكه وجرّب الألوان داخل مساحتك.','Choose a product, move it and try colours in your space.')+'</p></div><div class="brx-head-actions"><button type="button" data-brx="undo" id="brx-undo">↶ '+tr('تراجع','Undo')+'</button><button type="button" data-brx="redo" id="brx-redo">↷ '+tr('إعادة','Redo')+'</button><button type="button" class="brx-primary" data-brx="save">'+tr('حفظ التصميم','Save design')+'</button></div></header>'+
  '<section class="brx-layout"><aside class="brx-library"><header><small>'+tr('منتجات المتجر','STORE PRODUCTS')+'</small><h2>'+tr('اختر قطعة','Choose a piece')+'</h2></header><div class="brx-searchline"><input id="brx-search" placeholder="'+tr('ابحث عن منتج...','Search products...')+'" aria-label="'+tr('ابحث عن منتج','Search products')+'" autocomplete="off"></div><div id="brx-list" class="brx-item-list">'+listItems()+'</div><p class="brx-library-note">'+tr('نسّق المنتجات وراجع التفاصيل والمقاسات النهائية مع المتجر.','Arrange products and confirm final specifications with the store.')+'</p></aside>'+
- '<div class="brx-workspace"><div class="brx-workbar"><div><strong>'+tr('مساحتك','Your space')+'</strong><small data-brx-view-status>'+tr('عرض ثلاثي الأبعاد','3D view')+'</small>'+(isArkleen()?'<small class="brx-room-size">'+tr('الغرفة ٤ × ٤ م · ارتفاع الحائط ٣ م','Room 4 × 4 m · wall height 3 m')+'</small>':'')+'</div><div class="brx-workbuttons"><span class="brx-view-switch" role="group" aria-label="2D / 3D"><button type="button" data-brx-view="2d" aria-pressed="false">2D</button><button type="button" data-brx-view="3d" aria-pressed="true">3D</button></span><button data-brx="reset-camera">'+tr('ضبط المشهد','Reset view')+'</button><button data-brx="capture">'+tr('حفظ صورة','Save image')+'</button></div></div><div id="brx-viewport" class="brx-viewport"><div class="brx-watermark">'+tr('بيت الريف • تصميم تفاعلي','Biet Al Reef • Interactive design')+'</div><p id="brx-error" hidden>'+tr('تعذّر تشغيل العرض ثلاثي الأبعاد في هذا المتصفح.','3D preview is unavailable in this browser.')+'</p><div class="brx-canvas-tip">'+tr('اسحب القطع لتحريكها • اسحب الخلفية لتدوير المشهد','Drag a piece to move it • Drag the background to rotate')+'</div></div><div class="brx-footer-tools"><div><span>'+tr('تحريك القطع','Move pieces')+'</span><span>'+tr('ألوان قابلة للتغيير','Custom colours')+'</span></div><small>'+tr('تصميم قابل للتخصيص','Customisable design')+'</small></div></div>'+
+ '<div class="brx-workspace"><div class="brx-workbar"><div><strong>'+tr('مساحتك','Your space')+'</strong><small data-brx-view-status>'+tr('عرض ثلاثي الأبعاد','3D view')+'</small>'+(isArkleen()?'<small class="brx-room-size">'+tr('الغرفة ٤ × ٤ م · ارتفاع الحائط ٣ م','Room 4 × 4 m · wall height 3 m')+'</small>':'')+'</div><div class="brx-workbuttons"><span class="brx-view-switch" role="group" aria-label="2D / 3D"><button type="button" data-brx-view="2d" aria-pressed="false">2D</button><button type="button" data-brx-view="3d" aria-pressed="true">3D</button></span><button data-brx="reset-camera">'+tr('ضبط المشهد','Reset view')+'</button><button data-brx="capture">'+tr('حفظ صورة','Save image')+'</button></div></div><div id="brx-viewport" class="brx-viewport">'+(isArkleen()?'<svg class="brx-dimension-lines" aria-hidden="true"></svg>':'')+'<div class="brx-watermark">'+tr('بيت الريف • تصميم تفاعلي','Biet Al Reef • Interactive design')+'</div><p id="brx-error" hidden>'+tr('تعذّر تشغيل العرض ثلاثي الأبعاد في هذا المتصفح.','3D preview is unavailable in this browser.')+'</p><div class="brx-canvas-tip">'+tr('اسحب القطع لتحريكها • اسحب الخلفية لتدوير المشهد','Drag a piece to move it • Drag the background to rotate')+'</div></div>'+(isArkleen()?'<div id="brx-dimension-summary" class="brx-dimension-summary"></div>':'')+'<div class="brx-footer-tools"><div><span>'+tr('تحريك القطع','Move pieces')+'</span><span>'+tr('ألوان قابلة للتغيير','Custom colours')+'</span></div><small>'+tr('تصميم قابل للتخصيص','Customisable design')+'</small></div></div>'+
  '<aside class="brx-properties"><header><small>'+tr('تخصيص التصميم','CUSTOMISE')+'</small><h2>'+tr('الألوان والخامات','Colours and materials')+'</h2></header><div id="brx-selected"></div><div class="brx-swatches" id="brx-palettes">'+palettes()+'</div><div class="brx-summary"><strong>'+tr('محتويات المشهد','In your space')+'</strong><div><span id="brx-qty"></span></div><button data-brx="export" class="brx-save-list">'+tr('تنزيل قائمة العناصر','Download item list')+'</button><button data-brx="clear" class="brx-clear">'+tr('إفراغ المساحة','Clear space')+'</button></div></aside></section>'+
  ((merchant.whatsapp||merchant.appUrl)?'<section class="brx-quote"><div><small>'+tr('تفصيل على مقاسك','MADE FOR YOUR SPACE')+'</small><h2>'+tr('اطلب عرض سعر لتصميمك','Request a quote for your design')+'</h2><p>'+tr('أخبر المتجر بما تحتاجه، وأضف المقاسات المتوفرة لديك.','Tell the store what you need and share any dimensions you have.')+'</p></div>'+(merchant.whatsapp?'<form id="brx-quote-form"><p class="brx-quote-selection" id="brx-quote-selection"></p><label>'+tr('تفاصيل الطلب','What would you like made?')+'<textarea name="details" minlength="10" maxlength="1200" required placeholder="'+tr('الخامة، اللون، التقسيم الداخلي أو أي تفاصيل أخرى','Materials, colour, internal layout or other details')+'"></textarea></label><div class="brx-quote-fields"><label>'+tr('المقاسات المتوفرة (اختياري)','Available dimensions (optional)')+'<input name="dimensions" maxlength="200" placeholder="'+tr('العرض × الارتفاع × العمق','Width × height × depth')+'"></label><label>'+tr('المدينة أو المنطقة (اختياري)','City or area (optional)')+'<input name="area" maxlength="100" placeholder="'+tr('مثال: العين','For example: Al Ain')+'"></label></div><button type="submit" class="brx-quote-submit">'+tr('متابعة الطلب عبر واتساب','Continue via WhatsApp')+' ↗</button><p class="brx-quote-note">'+tr('ستفتح المحادثة لتراجع الرسالة وترسلها. يمكنك إرفاق صورة التصميم هناك.','Review and send the message in WhatsApp. You can attach your design image there.')+'</p></form>':'')+(merchant.appUrl?'<a class="brx-quote-app" href="'+esc(merchant.appUrl)+'" target="_blank" rel="noopener noreferrer">'+tr('افتح ملف المتجر داخل تطبيق بيت الريف','Open the store in the Biet Al Reef app')+' ↗</a>':'')+'</section>':'')+'</div>';
  create3D();refreshInspector();refreshSummary();state.chosen&&refreshSelection();
@@ -338,7 +370,7 @@ function palettes(){
 }
 function refreshInspector(){
  const item=state.items.find(x=>x.uid===state.chosen),it=ITEMS.find(x=>x.id===item?.type),el=document.querySelector('#brx-selected');if(!el)return;
- if(it&&isWallDoor(item)){el.innerHTML='<div class="brx-chosen"><span>'+esc(it.icon)+'</span><div><small>'+lang('القطعة المحددة','Selected item')+'</small><strong>'+esc(lang(it.ar,it.en))+'</strong><small>'+lang('باب داخل الحائط','Wall-mounted door')+'</small></div></div><div class="brx-ops"><label>'+lang('اسحب الباب على الحائط لتغيير مكانه','Drag the door along the wall')+'</label><div><button data-brx="movewall">'+lang('نقل للحائط الآخر','Move to other wall')+'</button><button class="brx-danger" data-brx="delete">'+lang('حذف','Remove')+'</button></div></div>';return}
+ if(it&&isWallDoor(item)){el.innerHTML='<div class="brx-chosen"><span>'+esc(it.icon)+'</span><div><small>'+lang('القطعة المحددة','Selected item')+'</small><strong>'+esc(lang(it.ar,it.en))+'</strong><small>'+lang('باب داخل الحائط','Wall-mounted door')+'</small></div></div><div class="brx-ops"><label>'+lang('حرّك الباب على الحائط','Move the door along the wall')+'</label><div><button data-brx="wall-minus">− 10 '+lang('سم','cm')+'</button><button data-brx="wall-plus">+ 10 '+lang('سم','cm')+'</button></div><div><button data-brx="movewall">'+lang('نقل للحائط الآخر','Move to other wall')+'</button><button class="brx-danger" data-brx="delete">'+lang('حذف','Remove')+'</button></div></div>';return}
  if(merchant){el.innerHTML=it?'<div class="brx-chosen"><span>'+esc(it.icon)+'</span><div><small>'+lang('القطعة المحددة','Selected item')+'</small><strong>'+esc(lang(it.ar,it.en))+'</strong><small>'+lang('عرض التصميم','Design view')+'</small></div></div><div class="brx-ops"><label>'+lang('تدوير القطعة','Rotate item')+'</label><div><button data-brx="rotleft">↶ 15°</button><button data-brx="rotright">↷ 15°</button></div><label>'+lang('حجم القطعة','Item size')+'</label><div><button data-brx="smaller">− '+lang('تصغير','Smaller')+'</button><button data-brx="bigger">+ '+lang('تكبير','Larger')+'</button></div><div><button data-brx="duplicate">'+lang('نسخ','Duplicate')+'</button><button class="brx-danger" data-brx="delete">'+lang('حذف','Remove')+'</button></div></div>':'<div class="brx-selecthint">'+lang('اضغط على قطعة لتعديلها.','Select a piece to edit it.')+'</div>';return}
  el.innerHTML=it?'<div class="brx-chosen"><span>'+it.icon+'</span><div><small>القطعة المحددة</small><strong>'+it.ar+'</strong><small>'+it.dim+'</small></div></div><div class="brx-ops"><label>دوران ثلاثي الأبعاد</label><div><button data-brx="rotleft">↶ 15°</button><button data-brx="rotright">↷ 15°</button></div><label>حجم القطعة</label><div><button data-brx="smaller">− تصغير</button><button data-brx="bigger">+ تكبير</button></div><div><button data-brx="duplicate">نسخ</button><button class="brx-danger" data-brx="delete">حذف</button></div></div>':'<div class="brx-selecthint">اضغط على قطعة داخل الغرفة لتدويرها وتغيير حجمها وتفاصيلها.</div>';
 }
@@ -372,7 +404,7 @@ function handleClick(e){
  if(action==='export'){const csv=x=>'"'+String(x??'').replace(/"/g,'""')+'"';const rows=[[lang('القطعة','Item'),lang('الحالة','Representation')],...state.items.map(x=>{let v=ITEMS.find(i=>i.id===x.type);return [lang(v?.ar||'',v?.en||''),lang('تصميم قابل للتخصيص','Customisable design')]})].map(row=>row.map(csv).join(','));let a=document.createElement('a'),blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});a.href=URL.createObjectURL(blob);a.download='biet-alreef-design-items.csv';a.click();URL.revokeObjectURL(a.href);return}
  if(action==='clear'){mutate(()=>{state.items=[];state.chosen=null});return}
  if(!selected)return;
- mutate(()=>{if(action==='movewall'&&isWallDoor(selected)){const offset=selected.wall==='back'?selected.x:selected.z;placeWallDoor(selected,offset,offset,selected.wall==='back'?'left':'back')}if(action==='rotleft'&&!isWallDoor(selected))selected.rot-=Math.PI/12;if(action==='rotright'&&!isWallDoor(selected))selected.rot+=Math.PI/12;if(action==='smaller'&&!isWallDoor(selected))selected.scale=Math.max(.55,selected.scale-.1);if(action==='bigger'&&!isWallDoor(selected))selected.scale=Math.min(1.7,selected.scale+.1);if(isArkleen()&&!isWallDoor(selected))fitArkleenItem(selected,selected.x,selected.z);if(action==='delete'){state.items=state.items.filter(x=>x.uid!==selected.uid);state.chosen=null}if(action==='duplicate'&&state.items.length<30&&!isWallDoor(selected)){let u='b'+Date.now()+'-'+(++uidseq),copy={...selected,uid:u,x:selected.x+.3};if(isArkleen())fitArkleenItem(copy,copy.x,copy.z);else copy.x=Math.min(3,copy.x);state.items.push(copy);state.chosen=u}});
+ mutate(()=>{if((action==='wall-minus'||action==='wall-plus')&&isWallDoor(selected)){const d=action==='wall-minus'?-.1:.1;placeWallDoor(selected,selected.x+(selected.wall==='back'?d:0),selected.z+(selected.wall==='left'?d:0),selected.wall)}if(action==='movewall'&&isWallDoor(selected)){const offset=selected.wall==='back'?selected.x:selected.z;placeWallDoor(selected,offset,offset,selected.wall==='back'?'left':'back')}if(action==='rotleft'&&!isWallDoor(selected))selected.rot-=Math.PI/12;if(action==='rotright'&&!isWallDoor(selected))selected.rot+=Math.PI/12;if(action==='smaller'&&!isWallDoor(selected))selected.scale=Math.max(.55,selected.scale-.1);if(action==='bigger'&&!isWallDoor(selected))selected.scale=Math.min(1.7,selected.scale+.1);if(isArkleen()&&!isWallDoor(selected))fitArkleenItem(selected,selected.x,selected.z);if(action==='delete'){state.items=state.items.filter(x=>x.uid!==selected.uid);state.chosen=null}if(action==='duplicate'&&state.items.length<30&&!isWallDoor(selected)){let u='b'+Date.now()+'-'+(++uidseq),copy={...selected,uid:u,x:selected.x+.3};if(isArkleen())fitArkleenItem(copy,copy.x,copy.z);else copy.x=Math.min(3,copy.x);state.items.push(copy);state.chosen=u}});
  }
  const cat=e.target.closest('[data-brx-cat]');if(cat){document.querySelectorAll('[data-brx-cat]').forEach(x=>x.classList.toggle('active',x===cat));document.querySelector('#brx-list').innerHTML=listItems(cat.dataset.brxCat,document.querySelector('#brx-search')?.value?.trim()||'')}
 }
@@ -417,7 +449,7 @@ function route(){const active=window.marketLocation.hash.split('?')[0]==='#studi
    if(!config||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(config.slug||'')||!Array.isArray(config.items))return;
    if(!/^\d{9,15}$/.test(config.whatsapp||''))config.whatsapp='';
    if(!/^https:\/\/providers\.bietalreef\.ae\/provider\/BR-[0-9]{7,12}$/.test(config.appUrl||''))config.appUrl='';
-   config.items=config.items.filter(i=>/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(i.id||'')&&['wooden-kitchen','wooden-wardrobe','wooden-door'].includes(i.model)&&/^\/(?:en\/)?product\/[A-Za-z0-9_-]+$/.test(i.href||'')&&(!i.image||i.image.startsWith('/')&&!i.image.startsWith('//')||/^https:\/\//.test(i.image)));
+   config.items=config.items.filter(i=>/^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$/.test(i.id||'')&&['wooden-kitchen','wooden-wardrobe','wooden-door'].includes(i.model)&&/^\/(?:en\/)?(?:product\/[A-Za-z0-9_-]+|products\/[a-z0-9][a-z0-9-]{0,119}\/[a-z0-9][a-z0-9-]{0,159})$/.test(i.href||'')&&(!i.image||i.image.startsWith('/')&&!i.image.startsWith('//')||/^https:\/\//.test(i.image)));
    if(!config.items.length)return;if(renderer||planFallback)destroy();configureContext(config);renderMerchantApp(target);
   }else if(!renderer&&!planFallback){create3D();refreshInspector();refreshSummary()}
   return;

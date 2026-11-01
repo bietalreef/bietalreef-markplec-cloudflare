@@ -30,9 +30,9 @@ function brxPane(kind){
  return '<header><small>احتفظ بالتصميم</small><h3>حفظ ومشاركة</h3></header><div class="brx-mobile-commands"><button data-brx="save">حفظ على الجهاز</button><button data-brx="capture">تنزيل صورة</button><button data-brx="export">قائمة القطع</button><button data-brx="undo">تراجع</button></div><p>الحفظ على جهازك دون حساب، وقطع التصميم ليست عروض بيع فعلية.</p>';
 }
 
-function brxMobileShow(kind,expand=true){
+function brxMobileShow(kind,expand=true,refresh=false){
  const bar=document.querySelector('.brx-mobile-dock');if(!bar)return;
- if(expand&&brxActive===kind&&bar.classList.contains('brx-panel-open')){brxClosePanel();return}
+ if(!refresh&&expand&&brxActive===kind&&bar.classList.contains('brx-panel-open')){brxClosePanel();return}
  brxActive=kind;
  bar.classList.toggle('brx-panel-open',expand);
  bar.querySelectorAll('[data-brx-tab]').forEach(b=>b.setAttribute('aria-selected',String(expand&&b.dataset.brxTab===kind)));
@@ -72,7 +72,7 @@ if(host)new MutationObserver(records=>{
   const refreshColors=records.some(r=>r.target?.closest?.('#brx-palettes'));
   if((brxActive==='items'&&refreshItems)||(brxActive==='colors'&&refreshColors)){
    const panel=st.querySelector('.brx-mobile-panel');
-   if(panel)panel.innerHTML=brxPane(brxActive);
+   if(panel&&st.querySelector('.brx-mobile-dock')?.classList.contains('brx-panel-open'))brxMobileShow(brxActive,true,true);
   }
  }
  if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.hero,.br-studio-teaser,#brx-studio')||n.querySelector?.('.hero,.br-studio-teaser,#brx-studio')))))brxSchedule();
@@ -80,10 +80,10 @@ if(host)new MutationObserver(records=>{
 document.addEventListener('click',e=>{
  const closer=e.target.closest('[data-brx-panel-close]');if(closer){brxClosePanel();return}
  const tab=e.target.closest('[data-brx-tab]');if(tab){brxMobileShow(tab.dataset.brxTab);return}
- const view=e.target.closest('[data-brx-view]');if(view){window.dispatchEvent(new CustomEvent('brx-camera-control',{detail:{view:view.dataset.brxView}}));return}
+ const view=e.target.closest('[data-brx-view]');if(view){if(['iso','front','top'].includes(view.dataset.brxView))window.dispatchEvent(new CustomEvent('brx-camera-control',{detail:{view:view.dataset.brxView}}));return}
  const zoom=e.target.closest('[data-brx-zoom]');if(zoom){window.dispatchEvent(new CustomEvent('brx-camera-control',{detail:{zoom:zoom.dataset.brxZoom==='in'?-1:1}}));return}
  if(e.target.closest('.brx-mobile-products [data-brx-add]'))setTimeout(()=>brxClosePanel(),180);
- else if(e.target.closest('.brx-mobile-panel [data-brx-color],.brx-mobile-panel [data-brx]'))setTimeout(()=>brxMobileShow(brxActive),180);
+ else if(e.target.closest('.brx-mobile-panel [data-brx-color],.brx-mobile-panel [data-brx]'))setTimeout(()=>{if(document.querySelector('.brx-mobile-dock.brx-panel-open'))brxMobileShow(brxActive,true,true)},180);
 });
 document.addEventListener('input',e=>{if(e.target.matches('[data-brx-mobile-search]')){brxTerm=e.target.value.trim();brxFilter()}});
 window.addEventListener('hashchange',brxSchedule);

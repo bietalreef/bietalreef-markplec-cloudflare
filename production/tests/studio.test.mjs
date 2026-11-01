@@ -40,3 +40,13 @@ test('a door opening follows the door in a four-metre room with three-metre wall
  check(api.build(),0);check(api.move(.7),.7);
  assert.ok(api.top().getObjectByName('arkleen-walls').children.filter(x=>x.userData.doorHeader).every(x=>!x.visible));
 });
+
+
+test('door measurements track both wall positions and sum to the wall width',()=>{
+ const piece=source.slice(source.indexOf('function wallDoorMeasurements('),source.indexOf('function updateMeasurements()'));
+ const measure=new Function(piece+'; return wallDoorMeasurements')();
+ for(const item of [{wall:'back',x:-1,z:-1.96},{wall:'back',x:.75,z:-1.96},{wall:'left',x:-1.96,z:.45}]){
+  const m=measure(item);assert.ok(m.before>=0&&m.after>=0);assert.ok(Math.abs(m.before+m.opening+m.after-4)<1e-8);assert.equal(m.width,1.2);assert.equal(m.height,2.3);
+ }
+ const d=api.model('d'),box=new T.Box3().setFromObject(d);assert.ok(Math.abs((box.max.x-box.min.x)-1.2)<.001);assert.ok(Math.abs(box.max.y-2.3)<.001);
+});
