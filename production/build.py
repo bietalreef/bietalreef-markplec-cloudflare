@@ -104,6 +104,9 @@ s=s[:old_start]+sitemap+s[old_end:]
 s=s.replace("let body=ASSETS[path];","let body=ASSETS[path]; if(liveHost&&path==='index.html'){const pages=await BR_LOAD_EXPERIENCES();body=body.replace('<main id=\"content\" tabindex=\"-1\"></main>','<main id=\"content\" tabindex=\"-1\">'+BR_HOME_HTML(pages,false)+'</main>');}",1)
 s=s.replace("+ '<link rel=\"canonical\" href=\"https://app.bietalreef.ae/\">\\n</head>'", "+ '<link rel=\"canonical\" href=\"https://app.bietalreef.ae/\"><link rel=\"alternate\" hreflang=\"ar-AE\" href=\"https://app.bietalreef.ae/\"><link rel=\"alternate\" hreflang=\"en-AE\" href=\"https://app.bietalreef.ae/en/\">\\n</head>'")
 
-s=s.replace(needle,english_home+(base/'merchant-worker-inject.mjs').read_text()+'\n'+inject+needle,1);
+legacy_redirect='''if(liveHost&&url.pathname==='/sitemap-index.xml')return Response.redirect('https://app.bietalreef.ae/sitemap.xml',301);
+if(liveHost){const target=legacyMarketRedirect(url.pathname,BR_DOCS);if(target)return Response.redirect('https://app.bietalreef.ae'+target+url.search,301);}
+'''
+s=s.replace(needle,legacy_redirect+english_home+(base/'merchant-worker-inject.mjs').read_text()+'\n'+inject+needle,1);
 s=s.replace("headers['Cache-Control']='public, max-age=300'", "headers['Cache-Control']='public, max-age=30'")
 s=s.replace("return new Response(request.method==='HEAD'?null:body,{status:200,headers});","return new Response(request.method==='HEAD'?null:(path==='index.html'?BR_REWRITE_LINKS(body.replace('<meta name=\"robots\" content=\"index,follow,max-image-preview:large\">',''),false):body),{status:200,headers});",1);(base/'dist').mkdir(exist_ok=True); (base/'dist/worker.mjs').write_text(s)

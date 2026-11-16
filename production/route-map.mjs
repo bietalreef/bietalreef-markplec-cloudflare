@@ -1,6 +1,22 @@
 // Route conversion for the public marketplace, independent of browser state.
 const staticRoutes = Object.freeze({home:'/', categories:'/categories', studio:'/studio', partners:'/experiences/partnerships', journey:'/how-it-works', cart:'/cart', sitemap:'/sitemap'});
 const visions = Object.freeze({showroom:'/experiences/stores', projects:'/experiences/contracting-services', studio:'/experiences/design'});
+
+// Old market information paths have exact equivalents in the current guides.
+// Unknown or merchant-specific paths remain untouched rather than being sent
+// to unrelated pages.
+export function legacyMarketRedirect(pathname, documents) {
+ const raw=String(pathname||'').replace(/\/+$/,'');
+ const en=raw.startsWith('/en/'), path=en?raw.slice(3):raw;
+ const prefix=en?'/en':'';
+ const owner=path.match(/^\/market\/provider-app\/([a-z0-9-]+)$/);
+ if(owner && Object.hasOwn(documents.ownerTopics || {},owner[1])) return prefix+'/business/'+owner[1];
+ const info=path.match(/^\/market\/([a-z0-9-]+)$/);
+ if(!info || !Object.hasOwn(documents.infoDocuments || {},info[1]))return null;
+ if(info[1]==='how-it-works')return prefix+'/how-it-works';
+ if(info[1]==='how-to-buy')return prefix+'/how-to-buy';
+ return prefix+'/guides/'+info[1];
+}
 export function fromLegacy(fragment) {
  const value=String(fragment||'').replace(/^#/,'');
  if (!value) return '/';

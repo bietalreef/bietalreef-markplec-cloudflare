@@ -23,6 +23,31 @@ test('legacy page fragments map to equivalent real paths and retain filters',()=
  assert.equal(fromLegacy('#content'),null);assert.equal(fromLegacy('#unknown'),null);
 });
 
+test('retired market information URLs redirect to their matching bilingual guides',async()=>{
+ const info=['customer-service','data-protection','direct-purchase','order-policy','provider-verification','publication-policy','report-content-provider','report-issue','returns-refunds','secure-payment','track-order'];
+ const owner=['google-shopping','help','orders','products','publication','services'];
+ for(const prefix of ['','/en']) {
+  for(const slug of info){
+   const source=prefix+'/market/'+slug+'/?utm_source=google', target=prefix+'/guides/'+slug;
+   const redirect=await response(source);assert.equal(redirect.status,301,source);
+   assert.equal(redirect.headers.get('location'),origin+target+'?utm_source=google');
+   assert.equal((await response(target)).status,200,target);
+  }
+  for(const slug of owner){
+   const source=prefix+'/market/provider-app/'+slug, target=prefix+'/business/'+slug;
+   const redirect=await response(source);assert.equal(redirect.status,301,source);
+   assert.equal(redirect.headers.get('location'),origin+target);
+   assert.equal((await response(target)).status,200,target);
+  }
+  const how=await response(prefix+'/market/how-it-works');
+  assert.equal(how.headers.get('location'),origin+prefix+'/how-it-works');
+ }
+ assert.equal((await response('/market/provider-app/not-a-real-topic')).status,404);
+ assert.equal((await response('/Marketplace/arkleen/policies/warranty')).status,404);
+ const sitemap=await response('/sitemap-index.xml');assert.equal(sitemap.status,301);
+ assert.equal(sitemap.headers.get('location'),origin+'/sitemap.xml');
+});
+
 test('all footer destinations resolve directly in both languages',async()=>{
  const all=new Set(footerSections.flatMap(s=>s.links.map(x=>x[1])));
  for(const link of all){const path=fromLegacy(link);assert.ok(path,link);for(const prefix of ['','/en']){const r=await response(prefix+path);assert.equal(r.status,200,prefix+path);assert.match(r.headers.get('content-type'),/text\/html/);}}
